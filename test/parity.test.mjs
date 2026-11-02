@@ -1,0 +1,44 @@
+// Parity tests: one per golden case, comparing stdout/stderr/exit exactly.
+import test, { before } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { makeFixture, runArbore, testDir } from './helper.mjs';
+
+const goldenDir = path.join(testDir, 'golden');
+
+// Each case: the exact argv passed to arbore (cwd = test/, as goldens were captured).
+const CASES = {
+  default: ['fx-tree'],
+  a: ['-a', 'fx-tree'],
+  d: ['-d', 'fx-tree'],
+  L1: ['-L', '1', 'fx-tree'],
+  L2: ['-L', '2', 'fx-tree'],
+  ad: ['-a', '-d', 'fx-tree'],
+  missing: ['nu-exista'],
+  I: ['-I', 'node_modules', 'fx-tree'],
+  P: ['-P', '*.js', 'fx-tree'],
+  dirsfirst: ['--dirsfirst', 'fx-tree'],
+  J: ['-J', 'fx-tree'],
+  IP: ['-I', 'node_modules|docs', 'fx-tree'],
+};
+
+function golden(name) {
+  return {
+    out: fs.readFileSync(path.join(goldenDir, name + '.out'), 'utf8'),
+    err: fs.readFileSync(path.join(goldenDir, name + '.err'), 'utf8'),
+    rc: Number(fs.readFileSync(path.join(goldenDir, name + '.rc'), 'utf8').trim()),
+  };
+}
+
+before(() => makeFixture());
+
+for (const [name, args] of Object.entries(CASES)) {
+  test(`parity: ${name} (${args.join(' ')})`, () => {
+    const got = runArbore(args);
+    const want = golden(name);
+    assert.equal(got.stdout, want.out, 'stdout mismatch');
+    assert.equal(got.stderr, want.err, 'stderr mismatch');
+    assert.equal(got.code, want.rc, 'exit code mismatch');
+  });
+}
