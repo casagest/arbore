@@ -2,7 +2,8 @@
 Stack propus: Node 22, zero dependențe, teste `node --test` prin evidence-gate.
 | id | funcție | prio | test de paritate (fixture fx-tree/ + output așteptat) |
 |---|---|---|---|
-| F1 | listare recursivă cu ├── └── │ | P0 | output identic cu `tree fx-tree` (capturat o dată) |
+| F1 | listare recursivă, linii ASCII (|-- `-- |) în locale C, ca `tree -n` | P0 | output identic cu golden default |
+| F14 | linii Unicode (├── └──) în locale UTF-8 | P2 | amânat (R-ulterior) |
 | F2 | sumar „N directories, M files” | P0 | ultimul rând identic |
 | F3 | sortare alfabetică (ca `tree` implicit, locale C) | P0 | ordine identică |
 | F4 | `-a` fișiere ascunse | P0 | cu/fără .ascuns |
@@ -15,4 +16,4 @@ Stack propus: Node 22, zero dependențe, teste `node --test` prin evidence-gate.
 | F11 | `--gitignore` | P2 | |
 | F12 | `-s`/`-h` mărimi | P2 | |
 | F13 | eroare pe cale inexistentă (exit≠0, mesaj) | P0 | |
-Gata înseamnă: P0 toți verzi în gate, P1 ≥ 4/5, checker 5/5.
+Gata înseamnă: P0 toți verzi în gate, toate P1 F7–F10 verzi, checker 5/5.
