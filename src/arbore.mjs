@@ -201,31 +201,60 @@ function renderJson(rootName, absRoot, opts) {
     rootNode = { type: 'directory', name: rootName, contents: build(top, absRoot, 1) };
   }
 
-  const report = { type: 'report', directories: counts.dirs, files: counts.files };
-  const errMode = code === 2;
+  // Rule derived from the -J goldens (J, Jempty, Jlocked, Jedge, Jedge_d):
+  // when a run hits a read error (code 2), tree closes the stream by padding
+  // the LAST leaf it emitted with an empty `"contents":[    ]`. "Leaf" = a file
+  // or an empty readable directory; error dirs carry their own padded form and
+  // never count. In a clean run (code 0) no node is padded. So the quirk is a
+  // single marked node, not a global mode flag.
+  const errTail = code === 2 ? lastLeaf(rootNode) : null;
   const stdout =
-    '[\n' + serializeNode(rootNode, 4, errMode) + '\n,    ' + serializeReport(report) + '\n]\n';
+    '[\n' + serializeNode(rootNode, 4, errTail) + '\n,    ' + serializeReport(counts, opts) + '\n]\n';
   return { stdout, stderr: '', code };
 }
 
-function serializeNode(node, indent, errMode) {
+// A leaf is a file or an empty readable directory (error dirs are not leaves).
+function isLeaf(node) {
+  return (
+    node.type === 'file' ||
+    (node.type === 'directory' && !node.error && (!node.contents || node.contents.length === 0))
+  );
+}
+
+// Last leaf in document (pre-order) order — the node tree pads on error.
+function lastLeaf(node) {
+  let last = null;
+  (function walk(n) {
+    if (isLeaf(n)) last = n;
+    if (n.contents) for (const c of n.contents) walk(c);
+  })(node);
+  return last;
+}
+
+function serializeNode(node, indent, errTail) {
   const pad = ' '.repeat(indent);
+  const padded = node === errTail; // the single error-tail node, else never
   if (node.type === 'file') {
     const name = JSON.stringify(node.name);
-    // When the tree hit an error, tree emits a padded empty contents on files.
-    return errMode
+    return padded
       ? `${pad}{"type":"file","name":${name},"contents":[    ]}`
       : `${pad}{"type":"file","name":${name}}`;
   }
-  const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)},"contents":[`;
-  if (node.error) return head + '{"error": "error opening dir"}    ]}';
-  if (!node.contents || node.contents.length === 0) return head + ']}';
-  const body = node.contents.map((c) => serializeNode(c, indent + 4, errMode)).join(',\n');
-  return head + '\n' + body + '\n' + pad + ']}';
+  const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)}`;
+  if (node.error) return head + ',"contents":[{"error": "error opening dir"}    ]}';
+  if (!node.contents || node.contents.length === 0) {
+    // Empty dir: contents omitted — unless it is the error-tail node.
+    return padded ? head + ',"contents":[    ]}' : head + '}';
+  }
+  const body = node.contents.map((c) => serializeNode(c, indent + 4, errTail)).join(',\n');
+  return head + ',"contents":[\n' + body + '\n' + pad + ']}';
 }
 
-function serializeReport(r) {
-  return `{"type":"report","directories":${r.directories},"files":${r.files}}`;
+// -d (dirs only) runs omit the files count (see Jedge_d golden).
+function serializeReport(counts, opts) {
+  return opts.dirsOnly
+    ? `{"type":"report","directories":${counts.dirs}}`
+    : `{"type":"report","directories":${counts.dirs},"files":${counts.files}}`;
 }
 
 // ---- entry point -------------------------------------------------------

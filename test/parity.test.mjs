@@ -28,6 +28,12 @@ const CASES = {
   // R2: unreadable subdir must be reported and affect the exit code.
   locked: ['fx-locked'],
   Jlocked: ['-J', 'fx-locked'],
+  // R3: empty dirs + error-tail padding in JSON; derived from these goldens.
+  edge: ['fx-edge'],
+  Jedge: ['-J', 'fx-edge'],
+  Jedge_d: ['-d', '-J', 'fx-edge'],
+  empty: ['fx-empty'],
+  Jempty: ['-J', 'fx-empty'],
 };
 
 function golden(name) {
