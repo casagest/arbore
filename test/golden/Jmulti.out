@@ -1,0 +1,11 @@
+[
+    {"type":"directory","name":"fx-empty","contents":[
+        {"type":"directory","name":"emptydir"},
+        {"type":"directory","name":"full","contents":[
+            {"type":"file","name":"f.txt"}
+        ]}
+    ]},
+    {"type":"unknown","name":"nu-exista","contents":[{"error": "error opening dir"}
+    ]}
+,    {"type":"report","directories":3,"files":1}
+]
