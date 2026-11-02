@@ -12,7 +12,7 @@ Stack propus: Node 22, zero dependențe, teste `node --test` prin evidence-gate.
 | F7 | `-I pattern` ignoră | P1 | `-I node_modules` |
 | F8 | `-P pattern` doar potriviri | P1 | |
 | F9 | `--dirsfirst` | P1 | |
-| F10 | `-J` ieșire JSON | P1 | JSON valid + structură |
+| F10 | `-J` ieșire JSON | P1 | JSON: semantic parity (owner decision A); byte-exact only for error-free runs |
 | F11 | `--gitignore` | P2 | |
 | F12 | `-s`/`-h` mărimi | P2 | |
 | F13 | eroare pe cale inexistentă (exit≠0, mesaj) | P0 | |

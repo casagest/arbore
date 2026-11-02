@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: prints the root name as the first line
+ok 1 - prints the root name as the first line
+  ---
+  duration_ms: 36.779806
+  type: 'test'
+  ...
+# Subtest: ends with a directories/files report line
+ok 2 - ends with a directories/files report line
+  ---
+  duration_ms: 34.805158
+  type: 'test'
+  ...
+# Subtest: parity: default (fx-tree)
+ok 3 - parity: default (fx-tree)
+  ---
+  duration_ms: 29.483269
+  type: 'test'
+  ...
+# Subtest: parity: a (-a fx-tree)
+ok 4 - parity: a (-a fx-tree)
+  ---
+  duration_ms: 32.841568
+  type: 'test'
+  ...
+# Subtest: parity: d (-d fx-tree)
+ok 5 - parity: d (-d fx-tree)
+  ---
+  duration_ms: 30.913162
+  type: 'test'
+  ...
+# Subtest: parity: L1 (-L 1 fx-tree)
+ok 6 - parity: L1 (-L 1 fx-tree)
+  ---
+  duration_ms: 35.29143
+  type: 'test'
+  ...
+# Subtest: parity: L2 (-L 2 fx-tree)
+ok 7 - parity: L2 (-L 2 fx-tree)
+  ---
+  duration_ms: 32.065156
+  type: 'test'
+  ...
+# Subtest: parity: ad (-a -d fx-tree)
+ok 8 - parity: ad (-a -d fx-tree)
+  ---
+  duration_ms: 37.945495
+  type: 'test'
+  ...
+# Subtest: parity: missing (nu-exista)
+ok 9 - parity: missing (nu-exista)
+  ---
+  duration_ms: 31.563876
+  type: 'test'
+  ...
+# Subtest: parity: I (-I node_modules fx-tree)
+ok 10 - parity: I (-I node_modules fx-tree)
+  ---
+  duration_ms: 29.916472
+  type: 'test'
+  ...
+# Subtest: parity: P (-P *.js fx-tree)
+ok 11 - parity: P (-P *.js fx-tree)
+  ---
+  duration_ms: 29.718453
+  type: 'test'
+  ...
+# Subtest: parity: dirsfirst (--dirsfirst fx-tree)
+ok 12 - parity: dirsfirst (--dirsfirst fx-tree)
+  ---
+  duration_ms: 33.711449
+  type: 'test'
+  ...
+# Subtest: parity: J (-J fx-tree)
+ok 13 - parity: J (-J fx-tree)
+  ---
+  duration_ms: 27.33132
+  type: 'test'
+  ...
+# Subtest: parity: IP (-I node_modules|docs fx-tree)
+ok 14 - parity: IP (-I node_modules|docs fx-tree)
+  ---
+  duration_ms: 26.918696
+  type: 'test'
+  ...
+# Subtest: parity: L0 (-L 0 fx-tree)
+ok 15 - parity: L0 (-L 0 fx-tree)
+  ---
+  duration_ms: 32.190626
+  type: 'test'
+  ...
+# Subtest: parity: Labc (-L abc fx-tree)
+ok 16 - parity: Labc (-L abc fx-tree)
+  ---
+  duration_ms: 39.719597
+  type: 'test'
+  ...
+# Subtest: parity: Lneg (-L -1 fx-tree)
+ok 17 - parity: Lneg (-L -1 fx-tree)
+  ---
+  duration_ms: 31.306128
+  type: 'test'
+  ...
+# Subtest: parity: locked (fx-locked)
+ok 18 - parity: locked (fx-locked)
+  ---
+  duration_ms: 32.749291
+  type: 'test'
+  ...
+# Subtest: parity: Jlocked (-J fx-locked)
+ok 19 - parity: Jlocked (-J fx-locked)
+  ---
+  duration_ms: 33.049406
+  type: 'test'
+  ...
+# Subtest: parity: edge (fx-edge)
+ok 20 - parity: edge (fx-edge)
+  ---
+  duration_ms: 42.08014
+  type: 'test'
+  ...
+# Subtest: parity: Jedge (-J fx-edge)
+ok 21 - parity: Jedge (-J fx-edge)
+  ---
+  duration_ms: 36.499507
+  type: 'test'
+  ...
+# Subtest: parity: Jedge_d (-d -J fx-edge)
+ok 22 - parity: Jedge_d (-d -J fx-edge)
+  ---
+  duration_ms: 34.170395
+  type: 'test'
+  ...
+# Subtest: parity: empty (fx-empty)
+ok 23 - parity: empty (fx-empty)
+  ---
+  duration_ms: 46.033249
+  type: 'test'
+  ...
+# Subtest: parity: Jempty (-J fx-empty)
+ok 24 - parity: Jempty (-J fx-empty)
+  ---
+  duration_ms: 32.391615
+  type: 'test'
+  ...
+# Subtest: json-structure: unreadable dir FIRST, among files and a readable subdir
+ok 25 - json-structure: unreadable dir FIRST, among files and a readable subdir
+  ---
+  duration_ms: 36.411579
+  type: 'test'
+  ...
+# Subtest: json-structure: unreadable dir in the MIDDLE, with nested and empty dirs
+ok 26 - json-structure: unreadable dir in the MIDDLE, with nested and empty dirs
+  ---
+  duration_ms: 28.713458
+  type: 'test'
+  ...
+# Subtest: json-structure: unreadable dir LAST
+ok 27 - json-structure: unreadable dir LAST
+  ---
+  duration_ms: 41.800455
+  type: 'test'
+  ...
+# Subtest: json-structure: only empty dirs, no errors (clean exit, no padding)
+ok 28 - json-structure: only empty dirs, no errors (clean exit, no padding)
+  ---
+  duration_ms: 34.654954
+  type: 'test'
+  ...
+# Subtest: json-structure: -d (dirs only) with unreadable last dir omits files
+ok 29 - json-structure: -d (dirs only) with unreadable last dir omits files
+  ---
+  duration_ms: 35.65383
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1098.717944

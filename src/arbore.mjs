@@ -174,14 +174,15 @@ function renderJson(rootName, absRoot, opts) {
           const childAbs = path.join(absDir, e.name);
           const children = listDir(childAbs, opts);
           if (children === null) {
-            // Unreadable subdir: carry the error field (don't silently skip).
+            // Unreadable subdir: carry the error entry (don't silently skip).
             code = 2;
-            out.push({ type: 'directory', name: e.name, contents: [], error: true });
+            out.push({ type: 'directory', name: e.name, error: true });
           } else {
             out.push({ type: 'directory', name: e.name, contents: build(children, childAbs, depth + 1) });
           }
         } else {
-          out.push({ type: 'directory', name: e.name, contents: [] });
+          // Depth-limited: a leaf directory, contents omitted.
+          out.push({ type: 'directory', name: e.name });
         }
       } else {
         counts.files++;
@@ -194,59 +195,38 @@ function renderJson(rootName, absRoot, opts) {
   const top = listDir(absRoot, opts);
   let rootNode;
   if (top === null) {
-    rootNode = { type: 'directory', name: rootName, contents: [], error: true };
+    rootNode = { type: 'directory', name: rootName, error: true };
     code = 2;
   } else {
     counts.dirs++;
     rootNode = { type: 'directory', name: rootName, contents: build(top, absRoot, 1) };
   }
 
-  // Rule derived from the -J goldens (J, Jempty, Jlocked, Jedge, Jedge_d):
-  // when a run hits a read error (code 2), tree closes the stream by padding
-  // the LAST leaf it emitted with an empty `"contents":[    ]`. "Leaf" = a file
-  // or an empty readable directory; error dirs carry their own padded form and
-  // never count. In a clean run (code 0) no node is padded. So the quirk is a
-  // single marked node, not a global mode flag.
-  const errTail = code === 2 ? lastLeaf(rootNode) : null;
+  // Owner decision A (2026-11-02): arbore emits STRUCTURALLY correct JSON and
+  // does NOT reproduce upstream tree's quirk of padding the last emitted leaf
+  // (and dirs-only empty dirs) with an empty `"contents":[    ]` on error runs
+  // (see checker R3, evidence/round-3-checker). Rules: file nodes never carry
+  // "contents"; empty readable dirs omit "contents"; unreadable dirs carry
+  // exactly `"contents":[{"error":"error opening dir"}]`. Error-free runs stay
+  // byte-exact with the J/Jempty goldens; error runs are semantic parity.
   const stdout =
-    '[\n' + serializeNode(rootNode, 4, errTail) + '\n,    ' + serializeReport(counts, opts) + '\n]\n';
+    '[\n' + serializeNode(rootNode, 4) + '\n,    ' + serializeReport(counts, opts) + '\n]\n';
   return { stdout, stderr: '', code };
 }
 
-// A leaf is a file or an empty readable directory (error dirs are not leaves).
-function isLeaf(node) {
-  return (
-    node.type === 'file' ||
-    (node.type === 'directory' && !node.error && (!node.contents || node.contents.length === 0))
-  );
-}
-
-// Last leaf in document (pre-order) order — the node tree pads on error.
-function lastLeaf(node) {
-  let last = null;
-  (function walk(n) {
-    if (isLeaf(n)) last = n;
-    if (n.contents) for (const c of n.contents) walk(c);
-  })(node);
-  return last;
-}
-
-function serializeNode(node, indent, errTail) {
+function serializeNode(node, indent) {
   const pad = ' '.repeat(indent);
-  const padded = node === errTail; // the single error-tail node, else never
   if (node.type === 'file') {
-    const name = JSON.stringify(node.name);
-    return padded
-      ? `${pad}{"type":"file","name":${name},"contents":[    ]}`
-      : `${pad}{"type":"file","name":${name}}`;
+    // Files never carry "contents".
+    return `${pad}{"type":"file","name":${JSON.stringify(node.name)}}`;
   }
   const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)}`;
-  if (node.error) return head + ',"contents":[{"error": "error opening dir"}    ]}';
+  if (node.error) return head + ',"contents":[{"error":"error opening dir"}]}';
   if (!node.contents || node.contents.length === 0) {
-    // Empty dir: contents omitted — unless it is the error-tail node.
-    return padded ? head + ',"contents":[    ]}' : head + '}';
+    // Empty readable (or depth-limited) dir: "contents" omitted.
+    return head + '}';
   }
-  const body = node.contents.map((c) => serializeNode(c, indent + 4, errTail)).join(',\n');
+  const body = node.contents.map((c) => serializeNode(c, indent + 4)).join(',\n');
   return head + ',"contents":[\n' + body + '\n' + pad + ']}';
 }
 
