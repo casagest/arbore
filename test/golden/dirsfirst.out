@@ -1,0 +1,23 @@
+fx-tree
+|-- Zeta
+|   `-- z.txt
+|-- alpha
+|   |-- beta
+|   |   |-- gamma
+|   |   |   `-- three.md
+|   |   `-- two.js
+|   `-- one.js
+|-- docs
+|   |-- api.json
+|   `-- guide.md
+|-- node_modules
+|   `-- pkg
+|       `-- index.js
+|-- 10.txt
+|-- 9.txt
+|-- README.md
+|-- _under.txt
+|-- a.js
+`-- b.txt
+
+8 directories, 13 files

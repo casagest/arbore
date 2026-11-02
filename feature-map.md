@@ -1,0 +1,18 @@
+# Feature map — arbore (paritate cu `tree`, clean-room)
+Stack propus: Node 22, zero dependențe, teste `node --test` prin evidence-gate.
+| id | funcție | prio | test de paritate (fixture fx-tree/ + output așteptat) |
+|---|---|---|---|
+| F1 | listare recursivă cu ├── └── │ | P0 | output identic cu `tree fx-tree` (capturat o dată) |
+| F2 | sumar „N directories, M files” | P0 | ultimul rând identic |
+| F3 | sortare alfabetică (ca `tree` implicit, locale C) | P0 | ordine identică |
+| F4 | `-a` fișiere ascunse | P0 | cu/fără .ascuns |
+| F5 | `-d` doar directoare | P0 | |
+| F6 | `-L N` adâncime maximă | P0 | L=1,2 |
+| F7 | `-I pattern` ignoră | P1 | `-I node_modules` |
+| F8 | `-P pattern` doar potriviri | P1 | |
+| F9 | `--dirsfirst` | P1 | |
+| F10 | `-J` ieșire JSON | P1 | JSON valid + structură |
+| F11 | `--gitignore` | P2 | |
+| F12 | `-s`/`-h` mărimi | P2 | |
+| F13 | eroare pe cale inexistentă (exit≠0, mesaj) | P0 | |
+Gata înseamnă: P0 toți verzi în gate, P1 ≥ 4/5, checker 5/5.

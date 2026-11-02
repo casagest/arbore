@@ -1,0 +1,11 @@
+fx-tree
+|-- .hidden_dir
+|-- Zeta
+|-- alpha
+|   `-- beta
+|       `-- gamma
+|-- docs
+`-- node_modules
+    `-- pkg
+
+9 directories

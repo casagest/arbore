@@ -1,0 +1,14 @@
+fx-tree
+|-- Zeta
+|-- a.js
+|-- alpha
+|   |-- beta
+|   |   |-- gamma
+|   |   `-- two.js
+|   `-- one.js
+|-- docs
+`-- node_modules
+    `-- pkg
+        `-- index.js
+
+8 directories, 4 files

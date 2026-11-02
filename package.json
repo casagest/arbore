@@ -1,0 +1,3 @@
+{ "name": "arbore", "version": "0.1.0", "description": "arbore: clean-room tree clone (MIT)", "license": "MIT", "type": "module",
+  "bin": { "arbore": "bin/arbore.mjs" }, "engines": { "node": ">=22" },
+  "scripts": { "test": "node --test test/", "gate": "node tools/evidence-gate/gate.mjs --out evidence/latest --min-tests 1 -- node --test test/" } }

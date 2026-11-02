@@ -1,0 +1,26 @@
+fx-tree
+|-- .env.example
+|-- .hidden_dir
+|   `-- secret.txt
+|-- 10.txt
+|-- 9.txt
+|-- README.md
+|-- Zeta
+|   `-- z.txt
+|-- _under.txt
+|-- a.js
+|-- alpha
+|   |-- beta
+|   |   |-- gamma
+|   |   |   `-- three.md
+|   |   `-- two.js
+|   `-- one.js
+|-- b.txt
+|-- docs
+|   |-- api.json
+|   `-- guide.md
+`-- node_modules
+    `-- pkg
+        `-- index.js
+
+9 directories, 15 files

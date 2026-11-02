@@ -1,0 +1,32 @@
+[
+    {"type":"directory","name":"fx-tree","contents":[
+        {"type":"file","name":"10.txt"},
+        {"type":"file","name":"9.txt"},
+        {"type":"file","name":"README.md"},
+        {"type":"directory","name":"Zeta","contents":[
+            {"type":"file","name":"z.txt"}
+        ]},
+        {"type":"file","name":"_under.txt"},
+        {"type":"file","name":"a.js"},
+        {"type":"directory","name":"alpha","contents":[
+            {"type":"directory","name":"beta","contents":[
+                {"type":"directory","name":"gamma","contents":[
+                    {"type":"file","name":"three.md"}
+                ]},
+                {"type":"file","name":"two.js"}
+            ]},
+            {"type":"file","name":"one.js"}
+        ]},
+        {"type":"file","name":"b.txt"},
+        {"type":"directory","name":"docs","contents":[
+            {"type":"file","name":"api.json"},
+            {"type":"file","name":"guide.md"}
+        ]},
+        {"type":"directory","name":"node_modules","contents":[
+            {"type":"directory","name":"pkg","contents":[
+                {"type":"file","name":"index.js"}
+            ]}
+        ]}
+    ]}
+,    {"type":"report","directories":8,"files":13}
+]
