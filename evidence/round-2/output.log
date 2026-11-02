@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: prints the root name as the first line
+ok 1 - prints the root name as the first line
+  ---
+  duration_ms: 30.883988
+  type: 'test'
+  ...
+# Subtest: ends with a directories/files report line
+ok 2 - ends with a directories/files report line
+  ---
+  duration_ms: 30.648798
+  type: 'test'
+  ...
+# Subtest: parity: default (fx-tree)
+ok 3 - parity: default (fx-tree)
+  ---
+  duration_ms: 38.472068
+  type: 'test'
+  ...
+# Subtest: parity: a (-a fx-tree)
+ok 4 - parity: a (-a fx-tree)
+  ---
+  duration_ms: 27.546331
+  type: 'test'
+  ...
+# Subtest: parity: d (-d fx-tree)
+ok 5 - parity: d (-d fx-tree)
+  ---
+  duration_ms: 29.800346
+  type: 'test'
+  ...
+# Subtest: parity: L1 (-L 1 fx-tree)
+ok 6 - parity: L1 (-L 1 fx-tree)
+  ---
+  duration_ms: 28.078363
+  type: 'test'
+  ...
+# Subtest: parity: L2 (-L 2 fx-tree)
+ok 7 - parity: L2 (-L 2 fx-tree)
+  ---
+  duration_ms: 32.246041
+  type: 'test'
+  ...
+# Subtest: parity: ad (-a -d fx-tree)
+ok 8 - parity: ad (-a -d fx-tree)
+  ---
+  duration_ms: 26.415131
+  type: 'test'
+  ...
+# Subtest: parity: missing (nu-exista)
+ok 9 - parity: missing (nu-exista)
+  ---
+  duration_ms: 28.662741
+  type: 'test'
+  ...
+# Subtest: parity: I (-I node_modules fx-tree)
+ok 10 - parity: I (-I node_modules fx-tree)
+  ---
+  duration_ms: 31.379964
+  type: 'test'
+  ...
+# Subtest: parity: P (-P *.js fx-tree)
+ok 11 - parity: P (-P *.js fx-tree)
+  ---
+  duration_ms: 32.487857
+  type: 'test'
+  ...
+# Subtest: parity: dirsfirst (--dirsfirst fx-tree)
+ok 12 - parity: dirsfirst (--dirsfirst fx-tree)
+  ---
+  duration_ms: 26.467219
+  type: 'test'
+  ...
+# Subtest: parity: J (-J fx-tree)
+ok 13 - parity: J (-J fx-tree)
+  ---
+  duration_ms: 25.191272
+  type: 'test'
+  ...
+# Subtest: parity: IP (-I node_modules|docs fx-tree)
+ok 14 - parity: IP (-I node_modules|docs fx-tree)
+  ---
+  duration_ms: 27.925195
+  type: 'test'
+  ...
+# Subtest: parity: L0 (-L 0 fx-tree)
+ok 15 - parity: L0 (-L 0 fx-tree)
+  ---
+  duration_ms: 26.452663
+  type: 'test'
+  ...
+# Subtest: parity: Labc (-L abc fx-tree)
+ok 16 - parity: Labc (-L abc fx-tree)
+  ---
+  duration_ms: 26.290334
+  type: 'test'
+  ...
+# Subtest: parity: Lneg (-L -1 fx-tree)
+ok 17 - parity: Lneg (-L -1 fx-tree)
+  ---
+  duration_ms: 25.628521
+  type: 'test'
+  ...
+# Subtest: parity: locked (fx-locked)
+ok 18 - parity: locked (fx-locked)
+  ---
+  duration_ms: 28.383167
+  type: 'test'
+  ...
+# Subtest: parity: Jlocked (-J fx-locked)
+ok 19 - parity: Jlocked (-J fx-locked)
+  ---
+  duration_ms: 26.533964
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 646.210413

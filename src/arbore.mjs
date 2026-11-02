@@ -15,6 +15,7 @@ export function parseArgs(argv) {
     json: false,
   };
   const paths = [];
+  let levelError = false;
 
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -34,8 +35,12 @@ export function parseArgs(argv) {
         else if (c === 'L' || c === 'I' || c === 'P') {
           const inline = a.slice(j + 1);
           const val = inline || argv[++i];
-          if (c === 'L') opts.maxDepth = Number(val);
-          else if (c === 'I') opts.ignore.push(...splitPatterns(val));
+          if (c === 'L') {
+            const n = Number(val);
+            // tree rejects non-integer / <1 levels (e.g. -L 0, -L abc, -L -1).
+            if (!Number.isInteger(n) || n < 1) levelError = true;
+            else opts.maxDepth = n;
+          } else if (c === 'I') opts.ignore.push(...splitPatterns(val));
           else opts.filePat.push(...splitPatterns(val));
           break; // option consumed the rest of this token
         }
@@ -45,7 +50,7 @@ export function parseArgs(argv) {
     }
   }
   if (paths.length === 0) paths.push('.');
-  return { opts, paths };
+  return { opts, paths, levelError };
 }
 
 // ---- glob matching (tree-style: `|` alternation, `*` and `?`) ----------
@@ -121,13 +126,22 @@ function renderText(rootName, absRoot, opts) {
     entries.forEach((e, i) => {
       const last = i === entries.length - 1;
       const isDir = e.isDirectory();
-      lines.push(prefix + (last ? '`-- ' : '|-- ') + e.name);
+      const branch = prefix + (last ? '`-- ' : '|-- ') + e.name;
       if (isDir) counts.dirs++;
       else counts.files++;
       if (isDir && (opts.maxDepth === null || depth < opts.maxDepth)) {
         const childAbs = path.join(absDir, e.name);
         const children = listDir(childAbs, opts);
-        if (children) walk(children, childAbs, prefix + (last ? '    ' : '|   '), depth + 1);
+        if (children === null) {
+          // Unreadable subdir: report it (don't silently skip) and fail.
+          lines.push(branch + '  [error opening dir]');
+          exitCode = 2;
+        } else {
+          lines.push(branch);
+          walk(children, childAbs, prefix + (last ? '    ' : '|   '), depth + 1);
+        }
+      } else {
+        lines.push(branch);
       }
     });
   }
@@ -149,19 +163,26 @@ function fileWord(n) {
 // ---- JSON rendering (-J) ------------------------------------------------
 function renderJson(rootName, absRoot, opts) {
   const counts = { dirs: 0, files: 0 };
+  let code = 0;
 
   function build(entries, absDir, depth) {
     const out = [];
     for (const e of entries) {
       if (e.isDirectory()) {
         counts.dirs++;
-        let contents = [];
         if (opts.maxDepth === null || depth < opts.maxDepth) {
           const childAbs = path.join(absDir, e.name);
           const children = listDir(childAbs, opts);
-          if (children) contents = build(children, childAbs, depth + 1);
+          if (children === null) {
+            // Unreadable subdir: carry the error field (don't silently skip).
+            code = 2;
+            out.push({ type: 'directory', name: e.name, contents: [], error: true });
+          } else {
+            out.push({ type: 'directory', name: e.name, contents: build(children, childAbs, depth + 1) });
+          }
+        } else {
+          out.push({ type: 'directory', name: e.name, contents: [] });
         }
-        out.push({ type: 'directory', name: e.name, contents });
       } else {
         counts.files++;
         out.push({ type: 'file', name: e.name });
@@ -172,9 +193,8 @@ function renderJson(rootName, absRoot, opts) {
 
   const top = listDir(absRoot, opts);
   let rootNode;
-  let code = 0;
   if (top === null) {
-    rootNode = { type: 'directory', name: rootName, contents: [], error: 'error opening dir' };
+    rootNode = { type: 'directory', name: rootName, contents: [], error: true };
     code = 2;
   } else {
     counts.dirs++;
@@ -182,19 +202,25 @@ function renderJson(rootName, absRoot, opts) {
   }
 
   const report = { type: 'report', directories: counts.dirs, files: counts.files };
+  const errMode = code === 2;
   const stdout =
-    '[\n' + serializeNode(rootNode, 4) + '\n,    ' + serializeReport(report) + '\n]\n';
+    '[\n' + serializeNode(rootNode, 4, errMode) + '\n,    ' + serializeReport(report) + '\n]\n';
   return { stdout, stderr: '', code };
 }
 
-function serializeNode(node, indent) {
+function serializeNode(node, indent, errMode) {
   const pad = ' '.repeat(indent);
   if (node.type === 'file') {
-    return `${pad}{"type":"file","name":${JSON.stringify(node.name)}}`;
+    const name = JSON.stringify(node.name);
+    // When the tree hit an error, tree emits a padded empty contents on files.
+    return errMode
+      ? `${pad}{"type":"file","name":${name},"contents":[    ]}`
+      : `${pad}{"type":"file","name":${name}}`;
   }
   const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)},"contents":[`;
+  if (node.error) return head + '{"error": "error opening dir"}    ]}';
   if (!node.contents || node.contents.length === 0) return head + ']}';
-  const body = node.contents.map((c) => serializeNode(c, indent + 4)).join(',\n');
+  const body = node.contents.map((c) => serializeNode(c, indent + 4, errMode)).join(',\n');
   return head + '\n' + body + '\n' + pad + ']}';
 }
 
@@ -204,7 +230,10 @@ function serializeReport(r) {
 
 // ---- entry point -------------------------------------------------------
 export function main(argv, cwd = process.cwd()) {
-  const { opts, paths } = parseArgs(argv);
+  const { opts, paths, levelError } = parseArgs(argv);
+  if (levelError) {
+    return { stdout: '', stderr: 'tree: Invalid level, must be greater than 0.\n', code: 1 };
+  }
   const rootName = paths[0];
   const absRoot = path.resolve(cwd, rootName);
   return opts.json

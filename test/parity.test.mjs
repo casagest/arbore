@@ -21,6 +21,13 @@ const CASES = {
   dirsfirst: ['--dirsfirst', 'fx-tree'],
   J: ['-J', 'fx-tree'],
   IP: ['-I', 'node_modules|docs', 'fx-tree'],
+  // R2: reject invalid -L levels (exit 1, message on stderr).
+  L0: ['-L', '0', 'fx-tree'],
+  Labc: ['-L', 'abc', 'fx-tree'],
+  Lneg: ['-L', '-1', 'fx-tree'],
+  // R2: unreadable subdir must be reported and affect the exit code.
+  locked: ['fx-locked'],
+  Jlocked: ['-J', 'fx-locked'],
 };
 
 function golden(name) {
