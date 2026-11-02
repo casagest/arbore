@@ -1,0 +1,10 @@
+fx-empty
+|-- emptydir
+`-- full
+    `-- f.txt
+fx-locked
+|-- locked  [error opening dir]
+`-- open
+    `-- f.txt
+
+6 directories, 2 files

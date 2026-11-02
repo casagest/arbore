@@ -107,16 +107,21 @@ function listDir(absDir, opts) {
 }
 
 // ---- text rendering (├── └── style, ASCII) -----------------------------
-function renderText(rootName, absRoot, opts) {
+// Multiple roots render one tree per path consecutively, sharing a single
+// trailing report (combined counts); exit is 2 if any root/subdir errored.
+function renderText(paths, cwd, opts) {
   const counts = { dirs: 0, files: 0 };
   const lines = [];
   let exitCode = 0;
 
-  const top = listDir(absRoot, opts);
-  if (top === null) {
-    lines.push(`${rootName}  [error opening dir]`);
-    exitCode = 2;
-  } else {
+  for (const rootName of paths) {
+    const absRoot = path.resolve(cwd, rootName);
+    const top = listDir(absRoot, opts);
+    if (top === null) {
+      lines.push(`${rootName}  [error opening dir]`);
+      exitCode = 2;
+      continue;
+    }
     lines.push(rootName);
     counts.dirs++; // the root itself counts as a directory
     walk(top, absRoot, '', 1);
@@ -161,7 +166,9 @@ function fileWord(n) {
 }
 
 // ---- JSON rendering (-J) ------------------------------------------------
-function renderJson(rootName, absRoot, opts) {
+// Multiple roots emit one array holding every root node followed by a single
+// combined report; exit is 2 if any root/subdir errored.
+function renderJson(paths, cwd, opts) {
   const counts = { dirs: 0, files: 0 };
   let code = 0;
 
@@ -192,14 +199,20 @@ function renderJson(rootName, absRoot, opts) {
     return out;
   }
 
-  const top = listDir(absRoot, opts);
-  let rootNode;
-  if (top === null) {
-    rootNode = { type: 'directory', name: rootName, error: true };
-    code = 2;
-  } else {
-    counts.dirs++;
-    rootNode = { type: 'directory', name: rootName, contents: build(top, absRoot, 1) };
+  const rootNodes = [];
+  for (const rootName of paths) {
+    const absRoot = path.resolve(cwd, rootName);
+    const top = listDir(absRoot, opts);
+    if (top === null) {
+      // An unopenable top-level argument: upstream tree can't classify it, so
+      // the node type is "unknown" (vs an unreadable subdir, which stays a
+      // "directory" with the error entry — see build() above).
+      rootNodes.push({ type: 'unknown', name: rootName, error: true });
+      code = 2;
+    } else {
+      counts.dirs++;
+      rootNodes.push({ type: 'directory', name: rootName, contents: build(top, absRoot, 1) });
+    }
   }
 
   // Owner decision A (2026-11-02): arbore emits STRUCTURALLY correct JSON and
@@ -209,8 +222,8 @@ function renderJson(rootName, absRoot, opts) {
   // "contents"; empty readable dirs omit "contents"; unreadable dirs carry
   // exactly `"contents":[{"error":"error opening dir"}]`. Error-free runs stay
   // byte-exact with the J/Jempty goldens; error runs are semantic parity.
-  const stdout =
-    '[\n' + serializeNode(rootNode, 4) + '\n,    ' + serializeReport(counts, opts) + '\n]\n';
+  const body = rootNodes.map((n) => serializeNode(n, 4)).join(',\n');
+  const stdout = '[\n' + body + '\n,    ' + serializeReport(counts, opts) + '\n]\n';
   return { stdout, stderr: '', code };
 }
 
@@ -220,7 +233,7 @@ function serializeNode(node, indent) {
     // Files never carry "contents".
     return `${pad}{"type":"file","name":${JSON.stringify(node.name)}}`;
   }
-  const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)}`;
+  const head = `${pad}{"type":${JSON.stringify(node.type)},"name":${JSON.stringify(node.name)}`;
   if (node.error) return head + ',"contents":[{"error":"error opening dir"}]}';
   if (!node.contents || node.contents.length === 0) {
     // Empty readable (or depth-limited) dir: "contents" omitted.
@@ -243,9 +256,5 @@ export function main(argv, cwd = process.cwd()) {
   if (levelError) {
     return { stdout: '', stderr: 'tree: Invalid level, must be greater than 0.\n', code: 1 };
   }
-  const rootName = paths[0];
-  const absRoot = path.resolve(cwd, rootName);
-  return opts.json
-    ? renderJson(rootName, absRoot, opts)
-    : renderText(rootName, absRoot, opts);
+  return opts.json ? renderJson(paths, cwd, opts) : renderText(paths, cwd, opts);
 }

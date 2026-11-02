@@ -1,0 +1,7 @@
+fx-empty
+|-- emptydir
+`-- full
+    `-- f.txt
+nu-exista  [error opening dir]
+
+3 directories, 1 file

@@ -35,6 +35,11 @@ const CASES = {
   Jedge_d: ['-d', '-J', 'fx-edge'],
   empty: ['fx-empty'],
   Jempty: ['-J', 'fx-empty'],
+  // Codex P2 (PR #1): multiple root paths render consecutively under one
+  // combined report; exit 2 if any root/subdir errored.
+  multi: ['fx-empty', 'fx-locked'],
+  multimiss: ['fx-empty', 'nu-exista'],
+  Jmulti: ['-J', 'fx-empty', 'nu-exista'],
 };
 
 function golden(name) {
@@ -54,7 +59,7 @@ function golden(name) {
 // empty-contents node means the same as one with no children. Error dirs keep
 // their non-empty [{error:...}] contents, so error semantics are fully preserved.
 // Error-free runs (J, Jempty) stay byte-exact (they are NOT in this set).
-const JSON_SEMANTIC_CASES = new Set(['Jlocked', 'Jedge', 'Jedge_d']);
+const JSON_SEMANTIC_CASES = new Set(['Jlocked', 'Jedge', 'Jedge_d', 'Jmulti']);
 
 function normalize(value) {
   if (Array.isArray(value)) return value.map(normalize);
