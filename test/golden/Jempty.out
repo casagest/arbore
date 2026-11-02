@@ -1,0 +1,9 @@
+[
+    {"type":"directory","name":"fx-empty","contents":[
+        {"type":"directory","name":"emptydir"},
+        {"type":"directory","name":"full","contents":[
+            {"type":"file","name":"f.txt"}
+        ]}
+    ]}
+,    {"type":"report","directories":3,"files":1}
+]
