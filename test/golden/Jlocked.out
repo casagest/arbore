@@ -1,0 +1,9 @@
+[
+    {"type":"directory","name":"fx-locked","contents":[
+        {"type":"directory","name":"locked","contents":[{"error": "error opening dir"}    ]},
+        {"type":"directory","name":"open","contents":[
+            {"type":"file","name":"f.txt","contents":[    ]}
+        ]}
+    ]}
+,    {"type":"report","directories":3,"files":1}
+]

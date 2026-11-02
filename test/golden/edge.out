@@ -1,0 +1,12 @@
+fx-edge
+|-- a.txt
+|-- a_empty
+|-- b
+|   |-- inner_ok
+|   |   `-- x.txt
+|   `-- zz_locked  [error opening dir]
+|-- c_file_dir
+|   `-- y.txt
+`-- zz_last_locked  [error opening dir]
+
+7 directories, 3 files

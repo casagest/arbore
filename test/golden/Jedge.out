@@ -1,0 +1,17 @@
+[
+    {"type":"directory","name":"fx-edge","contents":[
+        {"type":"file","name":"a.txt"},
+        {"type":"directory","name":"a_empty"},
+        {"type":"directory","name":"b","contents":[
+            {"type":"directory","name":"inner_ok","contents":[
+                {"type":"file","name":"x.txt"}
+            ]},
+            {"type":"directory","name":"zz_locked","contents":[{"error": "error opening dir"}    ]}
+        ]},
+        {"type":"directory","name":"c_file_dir","contents":[
+            {"type":"file","name":"y.txt","contents":[    ]}
+        ]},
+        {"type":"directory","name":"zz_last_locked","contents":[{"error": "error opening dir"}    ]}
+    ]}
+,    {"type":"report","directories":7,"files":3}
+]

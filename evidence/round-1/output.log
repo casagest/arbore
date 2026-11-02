@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: prints the root name as the first line
+ok 1 - prints the root name as the first line
+  ---
+  duration_ms: 29.702286
+  type: 'test'
+  ...
+# Subtest: ends with a directories/files report line
+ok 2 - ends with a directories/files report line
+  ---
+  duration_ms: 29.557939
+  type: 'test'
+  ...
+# Subtest: parity: default (fx-tree)
+ok 3 - parity: default (fx-tree)
+  ---
+  duration_ms: 28.394895
+  type: 'test'
+  ...
+# Subtest: parity: a (-a fx-tree)
+ok 4 - parity: a (-a fx-tree)
+  ---
+  duration_ms: 27.371709
+  type: 'test'
+  ...
+# Subtest: parity: d (-d fx-tree)
+ok 5 - parity: d (-d fx-tree)
+  ---
+  duration_ms: 32.432039
+  type: 'test'
+  ...
+# Subtest: parity: L1 (-L 1 fx-tree)
+ok 6 - parity: L1 (-L 1 fx-tree)
+  ---
+  duration_ms: 27.831867
+  type: 'test'
+  ...
+# Subtest: parity: L2 (-L 2 fx-tree)
+ok 7 - parity: L2 (-L 2 fx-tree)
+  ---
+  duration_ms: 27.701629
+  type: 'test'
+  ...
+# Subtest: parity: ad (-a -d fx-tree)
+ok 8 - parity: ad (-a -d fx-tree)
+  ---
+  duration_ms: 30.704675
+  type: 'test'
+  ...
+# Subtest: parity: missing (nu-exista)
+ok 9 - parity: missing (nu-exista)
+  ---
+  duration_ms: 27.209266
+  type: 'test'
+  ...
+# Subtest: parity: I (-I node_modules fx-tree)
+ok 10 - parity: I (-I node_modules fx-tree)
+  ---
+  duration_ms: 28.896922
+  type: 'test'
+  ...
+# Subtest: parity: P (-P *.js fx-tree)
+ok 11 - parity: P (-P *.js fx-tree)
+  ---
+  duration_ms: 31.59323
+  type: 'test'
+  ...
+# Subtest: parity: dirsfirst (--dirsfirst fx-tree)
+ok 12 - parity: dirsfirst (--dirsfirst fx-tree)
+  ---
+  duration_ms: 32.811691
+  type: 'test'
+  ...
+# Subtest: parity: J (-J fx-tree)
+ok 13 - parity: J (-J fx-tree)
+  ---
+  duration_ms: 30.324497
+  type: 'test'
+  ...
+# Subtest: parity: IP (-I node_modules|docs fx-tree)
+ok 14 - parity: IP (-I node_modules|docs fx-tree)
+  ---
+  duration_ms: 30.863729
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 484.641086

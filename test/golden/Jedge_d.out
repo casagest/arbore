@@ -1,0 +1,12 @@
+[
+    {"type":"directory","name":"fx-edge","contents":[
+        {"type":"directory","name":"a_empty"},
+        {"type":"directory","name":"b","contents":[
+            {"type":"directory","name":"inner_ok"},
+            {"type":"directory","name":"zz_locked","contents":[{"error": "error opening dir"}    ]}
+        ]},
+        {"type":"directory","name":"c_file_dir","contents":[    ]},
+        {"type":"directory","name":"zz_last_locked","contents":[{"error": "error opening dir"}    ]}
+    ]}
+,    {"type":"report","directories":7}
+]

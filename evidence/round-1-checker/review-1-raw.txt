@@ -1,0 +1,1147 @@
+Reading additional input from stdin...
+OpenAI Codex v0.164.0
+--------
+workdir: /workspace/research/programatorul-viitorului/pilot-arbore/repo
+model: gpt-6.1-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: none
+reasoning summaries: none
+session id: 01a19ba8-a259-7a90-bdda-d494d944d157
+--------
+user
+Ești CHECKER independent. Nu ai scris codul. Primești: PLAN.md, diff-ul, evidence/round-<R>/.
+1. Re-rulează tu gate-ul (nu te baza pe log-ul maker-ului). Dacă diferă ⇒ P0 „dovadă nereproductibilă”.
+2. Verifică fiecare item PLAN: implementat? testat cu dovadă? Teste care nu pot pica = P1.
+3. Caută: verde fals, scope creep, cod copiat din sursă GPL, secrete, date clinice.
+Ieșire STRICT:
+SCORE: n/5
+P0: ... | P1: ... | P2: ...
+VERDICT: READY | FIX | ABSTAIN(<motiv tipizat: NO-EVIDENCE|SCOPE|LICENCE|CLINICAL|BUDGET|UNCLEAR-PLAN>)
+5/5 doar dacă 0 P0, 0 P1, gate GREEN reprodus.
+Context: repo = cwd (project "arbore", clean-room clone of Unix tree, MIT, Node 22, zero deps). PLAN.md and feature-map.md are in the repo. Round R=1. Diff = all commits after 5acfb36 (git diff 5acfb36..HEAD). Maker evidence: evidence/round-0, evidence/round-1.
+Re-run the gate yourself: node tools/evidence-gate/gate.mjs --out /tmp/checker-r1 --min-tests 14 -- node --test test/   and also bash tools/evidence-gate/selftest.sh.
+Also check: do the parity tests truly compare stdout+stderr+exit exactly and could they pass vacuously? Is test/index.js a trick that hides or double-counts tests? Is there input that crashes (e.g. -L 0, -L abc, symlink loop, unreadable dir)? Any sign of copied GPL tree source? Scope: P0 = F1-F6,F13; P1 covered = F7-F10. Do NOT modify any files in the repo.
+Output STRICT format as specified (SCORE line, P0/P1/P2 lines, VERDICT line), findings concise.
+codex
+Voi verifica planul și diff-ul, voi rula independent ambele gate-uri și voi inspecta testele de paritate și cazurile-limită, fără să modific fișierele repo-ului.
+
+exec
+/bin/bash -lc "pwd; rg --files -g 'AGENTS.md' -g 'PLAN.md' -g 'feature-map.md'; git status --short; git diff --stat 5acfb36..HEAD" in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ succeeded in 0ms:
+/workspace/research/programatorul-viitorului/pilot-arbore/repo
+PLAN.md
+feature-map.md
+ bin/arbore.mjs               |   8 ++
+ evidence/round-0/output.log  |  22 +++++
+ evidence/round-0/run.json    |   8 ++
+ evidence/round-0/verdict.txt |   1 +
+ evidence/round-1/output.log  |  94 +++++++++++++++++++
+ evidence/round-1/run.json    |   8 ++
+ evidence/round-1/verdict.txt |   1 +
+ src/arbore.mjs               | 213 +++++++++++++++++++++++++++++++++++++++++++
+ test/helper.mjs              |  24 +++++
+ test/index.js                |   4 +
+ test/parity.test.mjs         |  44 +++++++++
+ test/r0.test.mjs             |  19 ++++
+ 12 files changed, 446 insertions(+)
+
+exec
+/bin/bash -lc 'node tools/evidence-gate/gate.mjs --out /tmp/checker-r1 --min-tests 14 -- node --test test/' in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ exited 9 in 540ms:
+VERDICT	STOP	nu pot rula: spawnSync node EPERM
+
+exec
+/bin/bash -lc 'bash tools/evidence-gate/selftest.sh' in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ exited 1 in 821ms:
+FAIL exp=0 got=9 -- node --test tools/evidence-gate-fx/pass.test.mjs
+FAIL exp=12 got=9 -- node --test tools/evidence-gate-fx/fail.test.mjs
+FAIL exp=7 got=9 -- node --test tools/evidence-gate-fx/skip.test.mjs
+FAIL exp=0 got=9 --max-skip 1 -- node --test tools/evidence-gate-fx/skip.test.mjs
+FAIL exp=7 got=9 -- node --test tools/evidence-gate-fx/empty.test.mjs
+FAIL exp=7 got=9 --min-tests 3 -- node --test tools/evidence-gate-fx/pass.test.mjs
+OK   exp=9 -- true
+OK   exp=9 -- bash -c echo "# tests 5"; echo "# pass 5"
+FAIL exp=14 got=9 -- bash -c printf "# tests 1\n# pass 1\n# fail 0\n"; exit 3
+OK   exp=2 --
+OK   exp=9 -- /nu/exista
+SELFTEST ok=4 bad=7
+
+exec
+/bin/bash -lc 'cat PLAN.md feature-map.md; cat src/arbore.mjs test/helper.mjs test/index.js test/parity.test.mjs test/r0.test.mjs bin/arbore.mjs' in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ succeeded in 0ms:
+# PLAN — arbore v1 (DRAFT, așteaptă ACCEPT Marin)
+- Goal: vezi goal.md. Gata = feature-map.md „Gata înseamnă”.
+- Out of scope: HTML/XML output, culori, Windows-specific.
+- Items: R0 schelet repo + evidence-gate copiat + LICENSE MIT | R1 F1–F6,F13 | R2 F7–F10 | R3 fix findings.
+- Fixture: director fx-tree/ generat de script, output-uri așteptate capturate rulând `tree` 2.x ca black box (comanda și versiunea în evidence).
+- Dovezi: `node pilot/evidence-gate/gate.mjs --out evidence/round-R --min-tests <nr P0> -- node --test` ; 0 skip.
+- Buget: 15 $ | 2 zile | 4 runde. Breaker: 2 runde fără creștere de scor ⇒ STOP.
+- Riscuri: copiere cod GPL (checker caută explicit); verde fals (gate); scope creep (checker P1).
+- Fără: push/CI/merge fără OK. Nimic în medicalcor-core.
+# Feature map — arbore (paritate cu `tree`, clean-room)
+Stack propus: Node 22, zero dependențe, teste `node --test` prin evidence-gate.
+| id | funcție | prio | test de paritate (fixture fx-tree/ + output așteptat) |
+|---|---|---|---|
+| F1 | listare recursivă cu ├── └── │ | P0 | output identic cu `tree fx-tree` (capturat o dată) |
+| F2 | sumar „N directories, M files” | P0 | ultimul rând identic |
+| F3 | sortare alfabetică (ca `tree` implicit, locale C) | P0 | ordine identică |
+| F4 | `-a` fișiere ascunse | P0 | cu/fără .ascuns |
+| F5 | `-d` doar directoare | P0 | |
+| F6 | `-L N` adâncime maximă | P0 | L=1,2 |
+| F7 | `-I pattern` ignoră | P1 | `-I node_modules` |
+| F8 | `-P pattern` doar potriviri | P1 | |
+| F9 | `--dirsfirst` | P1 | |
+| F10 | `-J` ieșire JSON | P1 | JSON valid + structură |
+| F11 | `--gitignore` | P2 | |
+| F12 | `-s`/`-h` mărimi | P2 | |
+| F13 | eroare pe cale inexistentă (exit≠0, mesaj) | P0 | |
+Gata înseamnă: P0 toți verzi în gate, P1 ≥ 4/5, checker 5/5.
+// arbore — clean-room clone of Unix `tree`.
+// Spec is the golden fixtures in test/golden (captured with `LC_ALL=C tree -n`).
+import fs from 'node:fs';
+import path from 'node:path';
+
+// ---- argument parsing --------------------------------------------------
+export function parseArgs(argv) {
+  const opts = {
+    all: false,
+    dirsOnly: false,
+    maxDepth: null,
+    ignore: [],
+    filePat: [],
+    dirsFirst: false,
+    json: false,
+  };
+  const paths = [];
+
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '--dirsfirst') {
+      opts.dirsFirst = true;
+    } else if (a === '--') {
+      for (i++; i < argv.length; i++) paths.push(argv[i]);
+    } else if (a.startsWith('--')) {
+      // unknown long option (e.g. --noreport); ignore for parity scope
+    } else if (a.length > 1 && a.startsWith('-')) {
+      for (let j = 1; j < a.length; j++) {
+        const c = a[j];
+        if (c === 'a') opts.all = true;
+        else if (c === 'd') opts.dirsOnly = true;
+        else if (c === 'J') opts.json = true;
+        else if (c === 'n' || c === 'C') { /* color flags; arbore never colors */ }
+        else if (c === 'L' || c === 'I' || c === 'P') {
+          const inline = a.slice(j + 1);
+          const val = inline || argv[++i];
+          if (c === 'L') opts.maxDepth = Number(val);
+          else if (c === 'I') opts.ignore.push(...splitPatterns(val));
+          else opts.filePat.push(...splitPatterns(val));
+          break; // option consumed the rest of this token
+        }
+      }
+    } else {
+      paths.push(a);
+    }
+  }
+  if (paths.length === 0) paths.push('.');
+  return { opts, paths };
+}
+
+// ---- glob matching (tree-style: `|` alternation, `*` and `?`) ----------
+function splitPatterns(str) {
+  return (str ?? '').split('|').filter((p) => p.length > 0);
+}
+
+function globToRegExp(glob) {
+  let re = '^';
+  for (const ch of glob) {
+    if (ch === '*') re += '.*';
+    else if (ch === '?') re += '.';
+    else re += ch.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(re + '$');
+}
+
+function matchesAny(name, patterns) {
+  return patterns.some((p) => globToRegExp(p).test(name));
+}
+
+// ---- byte-order (C locale) comparison ----------------------------------
+function byteCompare(a, b) {
+  return Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8'));
+}
+
+// ---- directory listing (filter + sort) ---------------------------------
+// Returns a sorted Dirent[] or null when the directory cannot be opened.
+function listDir(absDir, opts) {
+  let entries;
+  try {
+    entries = fs.readdirSync(absDir, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  const kept = entries.filter((e) => {
+    if (!opts.all && e.name.startsWith('.')) return false;
+    if (opts.ignore.length && matchesAny(e.name, opts.ignore)) return false;
+    const isDir = e.isDirectory();
+    if (opts.dirsOnly && !isDir) return false;
+    // -P filters files only; directories are always traversed/shown.
+    if (opts.filePat.length && !isDir && !matchesAny(e.name, opts.filePat)) return false;
+    return true;
+  });
+  kept.sort((a, b) => {
+    if (opts.dirsFirst) {
+      const ad = a.isDirectory();
+      const bd = b.isDirectory();
+      if (ad !== bd) return ad ? -1 : 1;
+    }
+    return byteCompare(a.name, b.name);
+  });
+  return kept;
+}
+
+// ---- text rendering (├── └── style, ASCII) -----------------------------
+function renderText(rootName, absRoot, opts) {
+  const counts = { dirs: 0, files: 0 };
+  const lines = [];
+  let exitCode = 0;
+
+  const top = listDir(absRoot, opts);
+  if (top === null) {
+    lines.push(`${rootName}  [error opening dir]`);
+    exitCode = 2;
+  } else {
+    lines.push(rootName);
+    counts.dirs++; // the root itself counts as a directory
+    walk(top, absRoot, '', 1);
+  }
+
+  function walk(entries, absDir, prefix, depth) {
+    entries.forEach((e, i) => {
+      const last = i === entries.length - 1;
+      const isDir = e.isDirectory();
+      lines.push(prefix + (last ? '`-- ' : '|-- ') + e.name);
+      if (isDir) counts.dirs++;
+      else counts.files++;
+      if (isDir && (opts.maxDepth === null || depth < opts.maxDepth)) {
+        const childAbs = path.join(absDir, e.name);
+        const children = listDir(childAbs, opts);
+        if (children) walk(children, childAbs, prefix + (last ? '    ' : '|   '), depth + 1);
+      }
+    });
+  }
+
+  const report = opts.dirsOnly
+    ? dirWord(counts.dirs)
+    : `${dirWord(counts.dirs)}, ${fileWord(counts.files)}`;
+  const stdout = [...lines, '', report].join('\n') + '\n';
+  return { stdout, stderr: '', code: exitCode };
+}
+
+function dirWord(n) {
+  return `${n} director${n === 1 ? 'y' : 'ies'}`;
+}
+function fileWord(n) {
+  return `${n} file${n === 1 ? '' : 's'}`;
+}
+
+// ---- JSON rendering (-J) ------------------------------------------------
+function renderJson(rootName, absRoot, opts) {
+  const counts = { dirs: 0, files: 0 };
+
+  function build(entries, absDir, depth) {
+    const out = [];
+    for (const e of entries) {
+      if (e.isDirectory()) {
+        counts.dirs++;
+        let contents = [];
+        if (opts.maxDepth === null || depth < opts.maxDepth) {
+          const childAbs = path.join(absDir, e.name);
+          const children = listDir(childAbs, opts);
+          if (children) contents = build(children, childAbs, depth + 1);
+        }
+        out.push({ type: 'directory', name: e.name, contents });
+      } else {
+        counts.files++;
+        out.push({ type: 'file', name: e.name });
+      }
+    }
+    return out;
+  }
+
+  const top = listDir(absRoot, opts);
+  let rootNode;
+  let code = 0;
+  if (top === null) {
+    rootNode = { type: 'directory', name: rootName, contents: [], error: 'error opening dir' };
+    code = 2;
+  } else {
+    counts.dirs++;
+    rootNode = { type: 'directory', name: rootName, contents: build(top, absRoot, 1) };
+  }
+
+  const report = { type: 'report', directories: counts.dirs, files: counts.files };
+  const stdout =
+    '[\n' + serializeNode(rootNode, 4) + '\n,    ' + serializeReport(report) + '\n]\n';
+  return { stdout, stderr: '', code };
+}
+
+function serializeNode(node, indent) {
+  const pad = ' '.repeat(indent);
+  if (node.type === 'file') {
+    return `${pad}{"type":"file","name":${JSON.stringify(node.name)}}`;
+  }
+  const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)},"contents":[`;
+  if (!node.contents || node.contents.length === 0) return head + ']}';
+  const body = node.contents.map((c) => serializeNode(c, indent + 4)).join(',\n');
+  return head + '\n' + body + '\n' + pad + ']}';
+}
+
+function serializeReport(r) {
+  return `{"type":"report","directories":${r.directories},"files":${r.files}}`;
+}
+
+// ---- entry point -------------------------------------------------------
+export function main(argv, cwd = process.cwd()) {
+  const { opts, paths } = parseArgs(argv);
+  const rootName = paths[0];
+  const absRoot = path.resolve(cwd, rootName);
+  return opts.json
+    ? renderJson(rootName, absRoot, opts)
+    : renderText(rootName, absRoot, opts);
+}
+// Shared test helpers: locate repo paths, (re)generate the fixture, run the CLI.
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+export const repoRoot = path.resolve(here, '..');
+export const testDir = here;
+export const bin = path.join(repoRoot, 'bin', 'arbore.mjs');
+
+// node_modules is gitignored, so the fixture must be regenerated before tests.
+export function makeFixture() {
+  const r = spawnSync('bash', [path.join(repoRoot, 'tools', 'make-fixture.sh'), 'fx-tree'], {
+    cwd: testDir,
+    encoding: 'utf8',
+  });
+  if (r.status !== 0) throw new Error('make-fixture failed: ' + (r.stderr || r.stdout));
+}
+
+// Run the CLI from test/ (same cwd the goldens were captured from).
+export function runArbore(args) {
+  const r = spawnSync('node', [bin, ...args], { cwd: testDir, encoding: 'utf8' });
+  return { stdout: r.stdout, stderr: r.stderr, code: r.status };
+}
+// Barrel: makes `node --test test/` resolve this dir to a module that
+// imports every test file so the gate's directory argument discovers them.
+import './r0.test.mjs';
+import './parity.test.mjs';
+// Parity tests: one per golden case, comparing stdout/stderr/exit exactly.
+import test, { before } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { makeFixture, runArbore, testDir } from './helper.mjs';
+
+const goldenDir = path.join(testDir, 'golden');
+
+// Each case: the exact argv passed to arbore (cwd = test/, as goldens were captured).
+const CASES = {
+  default: ['fx-tree'],
+  a: ['-a', 'fx-tree'],
+  d: ['-d', 'fx-tree'],
+  L1: ['-L', '1', 'fx-tree'],
+  L2: ['-L', '2', 'fx-tree'],
+  ad: ['-a', '-d', 'fx-tree'],
+  missing: ['nu-exista'],
+  I: ['-I', 'node_modules', 'fx-tree'],
+  P: ['-P', '*.js', 'fx-tree'],
+  dirsfirst: ['--dirsfirst', 'fx-tree'],
+  J: ['-J', 'fx-tree'],
+  IP: ['-I', 'node_modules|docs', 'fx-tree'],
+};
+
+function golden(name) {
+  return {
+    out: fs.readFileSync(path.join(goldenDir, name + '.out'), 'utf8'),
+    err: fs.readFileSync(path.join(goldenDir, name + '.err'), 'utf8'),
+    rc: Number(fs.readFileSync(path.join(goldenDir, name + '.rc'), 'utf8').trim()),
+  };
+}
+
+before(() => makeFixture());
+
+for (const [name, args] of Object.entries(CASES)) {
+  test(`parity: ${name} (${args.join(' ')})`, () => {
+    const got = runArbore(args);
+    const want = golden(name);
+    assert.equal(got.stdout, want.out, 'stdout mismatch');
+    assert.equal(got.stderr, want.err, 'stderr mismatch');
+    assert.equal(got.code, want.rc, 'exit code mismatch');
+  });
+}
+// R0 smoke tests: the CLI prints the root name and a report line.
+import test, { before } from 'node:test';
+import assert from 'node:assert/strict';
+import { makeFixture, runArbore } from './helper.mjs';
+
+before(() => makeFixture());
+
+test('prints the root name as the first line', () => {
+  const { stdout, code } = runArbore(['fx-tree']);
+  assert.equal(code, 0);
+  assert.equal(stdout.split('\n')[0], 'fx-tree');
+});
+
+test('ends with a directories/files report line', () => {
+  const { stdout } = runArbore(['fx-tree']);
+  const lines = stdout.split('\n').filter((l) => l.length > 0);
+  const last = lines[lines.length - 1];
+  assert.match(last, /^\d+ director(y|ies)(, \d+ files?)?$/);
+});
+#!/usr/bin/env node
+// arbore CLI entry — thin wrapper around src/arbore.mjs.
+import { main } from '../src/arbore.mjs';
+
+const { stdout, stderr, code } = main(process.argv.slice(2));
+if (stdout) process.stdout.write(stdout);
+if (stderr) process.stderr.write(stderr);
+process.exit(code);
+
+exec
+/bin/bash -lc "rg --files -g 'AGENTS.md' -g '*'; cat evidence/round-1/run.json evidence/round-1/verdict.txt evidence/round-1/output.log; cat tools/evidence-gate/gate.mjs" in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ succeeded in 0ms:
+LICENSE
+evidence/round-1/run.json
+evidence/round-1/output.log
+evidence/round-1/verdict.txt
+evidence/round-0/run.json
+evidence/round-0/output.log
+evidence/round-0/verdict.txt
+.gitignore
+feature-map.md
+src/arbore.mjs
+test/r0.test.mjs
+.git/index
+bin/arbore.mjs
+test/fx-tree/10.txt
+test/fx-tree/_under.txt
+test/fx-tree/.hidden_dir/secret.txt
+test/fx-tree/.env.example
+test/fx-tree/a.js
+tools/evidence-gate/selftest.sh
+tools/evidence-gate/gate.mjs
+tools/make-fixture.sh
+test/fx-tree/node_modules/pkg/index.js
+test/fx-tree/b.txt
+test/fx-tree/9.txt
+tools/evidence-gate-fx/empty.test.mjs
+tools/evidence-gate-fx/pass.test.mjs
+tools/evidence-gate-fx/skip.test.mjs
+tools/evidence-gate-fx/fail.test.mjs
+test/parity.test.mjs
+test/fx-tree/alpha/beta/gamma/three.md
+test/fx-tree/alpha/beta/two.js
+test/fx-tree/alpha/one.js
+test/fx-tree/README.md
+test/fx-tree/docs/guide.md
+test/fx-tree/docs/api.json
+test/fx-tree/Zeta/z.txt
+test/golden/ad.out
+test/golden/IP.err
+test/golden/L1.rc
+test/golden/L2.out
+test/golden/missing.out
+test/golden/L2.rc
+test/golden/dirsfirst.out
+test/golden/IP.rc
+test/golden/ad.rc
+test/golden/ad.err
+test/golden/default.rc
+test/golden/J.err
+test/golden/default.err
+test/golden/P.rc
+test/golden/missing.err
+test/golden/missing.rc
+test/golden/L1.out
+test/golden/a.err
+test/golden/IP.out
+test/golden/d.err
+test/golden/d.rc
+test/golden/L1.err
+test/golden/a.out
+test/golden/dirsfirst.rc
+test/golden/I.out
+test/golden/d.out
+test/golden/I.rc
+test/golden/L2.err
+test/golden/dirsfirst.err
+test/golden/a.rc
+test/golden/I.err
+test/golden/default.out
+test/golden/J.out
+test/golden/P.out
+test/golden/PROVENANCE.txt
+test/golden/J.rc
+test/golden/P.err
+test/helper.mjs
+test/index.js
+.git/objects/b2/f7de81ad6734a4df7c24827990ae2cfb6ae335
+.git/objects/65/9a9ca326bcbfbf70c61c41db037708367566ba
+.git/objects/04/a04147dd9d07d38b45633a867f3258af4fb0d1
+.git/objects/96/03ffddffc101da337bb196c001fb8b82e4612d
+.git/objects/36/8350566072e5d41265ad657d477334ad5e767a
+.git/objects/9f/f11bdaa48d5ade9835bbdb741c7ff702dc8713
+.git/objects/b3/9a71f32278e7805a8c00d12249177c59c8ec3c
+.git/objects/f3/393d4bb2c7ae207814672395c667e6fdf43420
+.git/objects/57/3541ac9702dd3969c9bc859d2b91ec1f7e6e56
+.git/objects/5a/cfb36e21dd767ec284eb949a4dba442834569b
+.git/objects/f8/46c89b2d9707287c697e94f5f0c9c785c02fcb
+.git/objects/cb/5767e6fb6449213d1f153eaa15fb735e34af00
+.git/objects/6a/d754b08a04ebd8791696dbb68d35b50ffb42b3
+.git/objects/5f/86acd364f84950093471381c312c9a8e96446c
+.git/objects/46/896601445ed7cca086f3bea7bc1476f0cf62a1
+.git/objects/39/d213234adf01af23420472feb9a848fd10188d
+.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+.git/objects/9c/01ade696dc5102e555f6ec6666b9ae8dd2a00a
+.git/objects/4e/d2cfffd2db8782df2dc7887630f7ea5541a277
+.git/refs/heads/main
+.git/objects/73/297e7f740c9315f46d05a93f28ada0fcb675a9
+.git/objects/81/6561d9c15dcbfce1d8cd8b7dd7140c15e54cd1
+.git/info/exclude
+.git/HEAD
+.git/objects/67/eea361cb20dcfe60d876ea92b86440c7258e40
+.git/objects/d3/6d0560aa6e7f451e86756ec19f94ddd0089290
+.git/objects/cd/5b0edec83891263e11c2d23d788c2aa5ada073
+.git/objects/54/0b24fec23906455a5e22de7cb83204ebf702fc
+.git/hooks/pre-rebase.sample
+.git/hooks/update.sample
+.git/hooks/fsmonitor-watchman.sample
+.git/hooks/pre-merge-commit.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/applypatch-msg.sample
+.git/hooks/pre-receive.sample
+.git/hooks/post-update.sample
+.git/hooks/pre-push.sample
+.git/hooks/pre-commit.sample
+.git/hooks/push-to-checkout.sample
+.git/hooks/commit-msg.sample
+.git/hooks/prepare-commit-msg.sample
+.git/hooks/pre-applypatch.sample
+.git/description
+.git/objects/a6/ab12d84d8b4c02444453cb6de4db126f2a36a6
+.git/config
+.git/objects/a8/52d11bfb60ebb8e26c60d82fb351ab85931525
+.git/objects/e1/f3bb327dadc3d8aba73289a61f3eeafb1ef608
+.git/objects/5c/dd5bf84d701f28a47952ca50403f9ad7101557
+.git/objects/1c/e7f2db92e04172209649b7366b3c1727b43561
+.git/objects/5b/54c122a789ef09e9107692b2aa061e7c4aefc8
+.git/logs/refs/heads/main
+.git/logs/HEAD
+.git/COMMIT_EDITMSG
+PLAN.md
+package.json
+README.md
+.git/objects/45/d2e6a86c3e51551cd9cd8f616af07acad3dc7d
+.git/objects/45/dda3a3c2345446e7a32a6e5e7c69aa15ee1e0c
+.git/objects/41/85cd7c29235a78849bf6ef3fdb41687a53e5d7
+.git/objects/60/ba0db5ddb95e720549793fe64deebaf6d6e4c6
+.git/objects/a1/1b7ad556e3cdb53fb36750fd6230db6d7ede3d
+.git/objects/d8/8a54bb2cec20992c7d772d8ddb1f643aff8c9b
+.git/objects/4c/ca6fe45234a85eabea53e480bca140eebef4aa
+.git/objects/55/4cb6434e00be54a8fcf34ac7ea29b7391bdb17
+.git/objects/ba/9ff9b59ae0616eb90e4b420e8f6f6b4e0f7141
+.git/objects/fd/ea9d26955f208fffca336cfa285c8600f1636e
+.git/objects/93/c4fc645182a5ac05041026c5ba63685cdbc9e9
+.git/objects/a9/3db62770d4813d1daf71c80dda77b473f507df
+.git/objects/58/e164c71c5b54f916b1f13bbf455115e42d612a
+.git/objects/e3/cb490e847ea3615a9d8428c90a34952cd5788d
+.git/objects/0c/fbf08886fca9a91cb753ec8734c84fcbe52c9f
+.git/objects/fb/29ec1b882b0d1a351392f653230fb36609a696
+.git/objects/08/2d45f7506348809691e5fe2a5eccaf4846c7fb
+.git/objects/17/32a93428973726a86d8e310eaa30f675525df1
+.git/objects/b8/03a66ae9fd9a44b021b0a8b3a63b197c429454
+.git/objects/84/d405499e50852343c12fbbade550cabb86c2b5
+.git/objects/cc/a3f2b82b12b3abaea30039d1e5e323a1b986fb
+.git/objects/a3/57eb725be5adbd0c1084f8d8df662306178a39
+.git/objects/15/eba8ca6f2b132cbde7d05a65e86a0973ee6506
+.git/objects/8b/137891791fe96927ad78e64b0aad7bded08bdc
+.git/objects/b4/cd725d5c3cb3c730fb43f193af732c20a8a92e
+.git/objects/8b/002a2b190229fe9aa4454e6431c0dd2391b9f9
+.git/objects/14/1a3bf90b73cf932e0a41cabfea5945c19d4d9c
+.git/objects/14/52a5cbcb21da950396d8805d1d6b59cb3b95aa
+.git/objects/c7/dd192fc1057674870a8b32a8fdc16fa09b3d64
+.git/objects/89/be6a7782fde6e43705ff5b75452e78af03c508
+.git/objects/91/9be0c179f80561baa096904db084f55e0dc96e
+.git/objects/ed/45e9d04ba609c98ed619dffbef3bac4c8e91e3
+.git/objects/ed/974d4bfb115f1caef44558c42158ce3e8c34b1
+.git/objects/78/1afadee5b5a7bf9e0e308ee2c5cc30d0e967eb
+.git/objects/63/cc05d1fa3c76b00be3754e2a7bea1a498bb810
+.git/objects/d9/305c21440d17bedacec5b7f611b386b3813f07
+.git/objects/ef/f932fd74d7063e1e9dd4a3ff55fee1852dab1d
+.git/objects/f7/8863ce62ac438dbcf757b9def384b2a4e70314
+{
+ "cmd": "node --test test/",
+ "exit": 0,
+ "signal": null,
+ "ms": 518,
+ "sha256": "24e0fa267c5bc9b066e6d0eae597c2c810da79daa65e46ffee56d565532e966b",
+ "at": "2026-11-02T09:47:20.995Z"
+}VERDICT	GREEN	PASS=14	sha256=24e0fa267c5b
+TAP version 13
+# Subtest: prints the root name as the first line
+ok 1 - prints the root name as the first line
+  ---
+  duration_ms: 29.702286
+  type: 'test'
+  ...
+# Subtest: ends with a directories/files report line
+ok 2 - ends with a directories/files report line
+  ---
+  duration_ms: 29.557939
+  type: 'test'
+  ...
+# Subtest: parity: default (fx-tree)
+ok 3 - parity: default (fx-tree)
+  ---
+  duration_ms: 28.394895
+  type: 'test'
+  ...
+# Subtest: parity: a (-a fx-tree)
+ok 4 - parity: a (-a fx-tree)
+  ---
+  duration_ms: 27.371709
+  type: 'test'
+  ...
+# Subtest: parity: d (-d fx-tree)
+ok 5 - parity: d (-d fx-tree)
+  ---
+  duration_ms: 32.432039
+  type: 'test'
+  ...
+# Subtest: parity: L1 (-L 1 fx-tree)
+ok 6 - parity: L1 (-L 1 fx-tree)
+  ---
+  duration_ms: 27.831867
+  type: 'test'
+  ...
+# Subtest: parity: L2 (-L 2 fx-tree)
+ok 7 - parity: L2 (-L 2 fx-tree)
+  ---
+  duration_ms: 27.701629
+  type: 'test'
+  ...
+# Subtest: parity: ad (-a -d fx-tree)
+ok 8 - parity: ad (-a -d fx-tree)
+  ---
+  duration_ms: 30.704675
+  type: 'test'
+  ...
+# Subtest: parity: missing (nu-exista)
+ok 9 - parity: missing (nu-exista)
+  ---
+  duration_ms: 27.209266
+  type: 'test'
+  ...
+# Subtest: parity: I (-I node_modules fx-tree)
+ok 10 - parity: I (-I node_modules fx-tree)
+  ---
+  duration_ms: 28.896922
+  type: 'test'
+  ...
+# Subtest: parity: P (-P *.js fx-tree)
+ok 11 - parity: P (-P *.js fx-tree)
+  ---
+  duration_ms: 31.59323
+  type: 'test'
+  ...
+# Subtest: parity: dirsfirst (--dirsfirst fx-tree)
+ok 12 - parity: dirsfirst (--dirsfirst fx-tree)
+  ---
+  duration_ms: 32.811691
+  type: 'test'
+  ...
+# Subtest: parity: J (-J fx-tree)
+ok 13 - parity: J (-J fx-tree)
+  ---
+  duration_ms: 30.324497
+  type: 'test'
+  ...
+# Subtest: parity: IP (-I node_modules|docs fx-tree)
+ok 14 - parity: IP (-I node_modules|docs fx-tree)
+  ---
+  duration_ms: 30.863729
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 484.641086
+// gate.mjs — poartă de dovezi fail-closed (pattern w0-tools irun/count/xrun), pentru node --test (TAP).
+// Usage: node gate.mjs --out DIR [--min-tests N] [--max-skip N] -- <cmd> [args...]
+// v2: fișier de test gol (node raportează fișierul ca 1 test trecut) => exit 7.
+// Exit: 0 GREEN | 2 usage | 7 prea puține teste / prea multe skip | 9 output ilizibil (fără sumar TAP) | 12 FAILED | 14 cmd exit≠0 fără fail raportat
+import {spawnSync} from 'node:child_process'; import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto';
+const a=process.argv.slice(2); const sep=a.indexOf('--'); const o=sep<0?a:a.slice(0,sep); const cmd=sep<0?[]:a.slice(sep+1);
+const opt=(k,d)=>{const i=o.indexOf(k);return i<0?d:o[i+1]};
+const out=opt('--out',''), minT=Number(opt('--min-tests','1')), maxS=Number(opt('--max-skip','0'));
+const stop=(c,m)=>{const v='VERDICT\tSTOP\t'+m; console.log(v); if(out){try{fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'verdict.txt'),v+'\n')}catch{}} process.exit(c)};
+if(!out||!cmd.length||!(minT>=1)||!(maxS>=0)) stop(2,'usage: gate.mjs --out DIR [--min-tests N>=1] [--max-skip N] -- cmd');
+fs.mkdirSync(out,{recursive:true});
+const t0=Date.now(); const r=spawnSync(cmd[0],cmd.slice(1),{encoding:'utf8',maxBuffer:64<<20});
+const log=(r.stdout||'')+(r.stderr||''); fs.writeFileSync(path.join(out,'output.log'),log);
+const meta={cmd:cmd.join(' '),exit:r.status,signal:r.signal,ms:Date.now()-t0,sha256:crypto.createHash('sha256').update(log).digest('hex'),at:new Date().toISOString()};
+fs.writeFileSync(path.join(out,'run.json'),JSON.stringify(meta,null,1));
+const n=k=>{const m=log.match(new RegExp('^# '+k+' (\\d+)$','m'));return m?Number(m[1]):null};
+const T=n('tests'),P=n('pass'),F=n('fail'),S=(n('skipped')??0)+(n('todo')??0),C=n('cancelled')??0;
+if(r.error) stop(9,'nu pot rula: '+r.error.message);
+if(T===null||P===null||F===null) stop(9,'fără sumar TAP (# tests/# pass/# fail) — nu accept verde fără numărătoare');
+console.log(`TOTAL\tTESTS=${T}\tPASS=${P}\tFAIL=${F}\tSKIP=${S}\tCANCELLED=${C}\tEXIT=${r.status}`);
+if(F>0||C>0) stop(12,`FAIL=${F} CANCELLED=${C}`);
+if(r.status!==0) stop(14,'exit='+r.status+' dar FAIL=0 — suspect, nu e verde');
+if(P<minT) stop(7,`PASS=${P} < MIN=${minT}`);
+if(S>maxS) stop(7,`SKIP=${S} > MAX=${maxS}`);
+const ghost=[...log.matchAll(/^ok \d+ - (\S+\.(?:[cm]?[jt]s))$/gm)].map(m=>m[1]); if(ghost.length) stop(7,'fișier fără niciun test (verde fals node --test): '+ghost.join(','));
+if(P+S!==T) stop(9,`numărătoare inconsistentă T=${T} P=${P} S=${S}`);
+const v=`VERDICT\tGREEN\tPASS=${P}\tsha256=${meta.sha256.slice(0,12)}`; console.log(v); fs.writeFileSync(path.join(out,'verdict.txt'),v+'\n');
+
+codex
+Gate-ul cerut a returnat STOP (`spawnSync node EPERM`), față de GREEN în dovada maker-ului; selftest-ul are 7 eșecuri din aceeași restricție de execuție. Testele de paritate compară explicit stdout, stderr și exit code. Continui verificarea prin apeluri directe ale implementării și cazuri create în `/tmp`.
+
+exec
+/bin/bash -lc "cat test/golden/PROVENANCE.txt README.md package.json tools/make-fixture.sh LICENSE; git diff 5acfb36..HEAD -- . ':"'!evidence'"'; node --version; command -v tree; git status --short" in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ succeeded in 0ms:
+LC_ALL=C /workspace/ref/tree-ref -n <args> ; tree v2.3.2 built from upstream tarball as black box; source deleted after build
+# arbore
+Clean-room clone of the Unix `tree` command in Node 22, zero dependencies. MIT.
+Written without reading `tree` source (GPL-2.0); parity is checked only against observed output (`test/golden/`, see PROVENANCE.txt).
+Usage: `node bin/arbore.mjs [-a] [-d] [-L n] [-I pat] [-P pat] [--dirsfirst] [-J] [--noreport] [dir...]`
+{ "name": "arbore", "version": "0.1.0", "description": "arbore: clean-room tree clone (MIT)", "license": "MIT", "type": "module",
+  "bin": { "arbore": "bin/arbore.mjs" }, "engines": { "node": ">=22" },
+  "scripts": { "test": "node --test test/", "gate": "node tools/evidence-gate/gate.mjs --out evidence/latest --min-tests 1 -- node --test test/" } }
+#!/usr/bin/env bash
+# Creează fixture determinist fx-tree/ (re-rulabil).
+set -e; D=${1:-test/fx-tree}; rm -rf "$D"; mkdir -p "$D"/{alpha/beta/gamma,docs,node_modules/pkg,.hidden_dir,Zeta}
+touch "$D"/README.md "$D"/b.txt "$D"/a.js "$D"/.env.example "$D"/alpha/one.js "$D"/alpha/beta/two.js "$D"/alpha/beta/gamma/three.md \
+ "$D"/docs/guide.md "$D"/docs/api.json "$D"/node_modules/pkg/index.js "$D"/.hidden_dir/secret.txt "$D"/Zeta/z.txt "$D"/_under.txt "$D"/10.txt "$D"/9.txt
+MIT License
+
+Copyright (c) 2026 Marin Popa
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+diff --git a/bin/arbore.mjs b/bin/arbore.mjs
+new file mode 100644
+index 0000000..9c01ade
+--- /dev/null
++++ b/bin/arbore.mjs
+@@ -0,0 +1,8 @@
++#!/usr/bin/env node
++// arbore CLI entry — thin wrapper around src/arbore.mjs.
++import { main } from '../src/arbore.mjs';
++
++const { stdout, stderr, code } = main(process.argv.slice(2));
++if (stdout) process.stdout.write(stdout);
++if (stderr) process.stderr.write(stderr);
++process.exit(code);
+diff --git a/src/arbore.mjs b/src/arbore.mjs
+new file mode 100644
+index 0000000..816561d
+--- /dev/null
++++ b/src/arbore.mjs
+@@ -0,0 +1,213 @@
++// arbore — clean-room clone of Unix `tree`.
++// Spec is the golden fixtures in test/golden (captured with `LC_ALL=C tree -n`).
++import fs from 'node:fs';
++import path from 'node:path';
++
++// ---- argument parsing --------------------------------------------------
++export function parseArgs(argv) {
++  const opts = {
++    all: false,
++    dirsOnly: false,
++    maxDepth: null,
++    ignore: [],
++    filePat: [],
++    dirsFirst: false,
++    json: false,
++  };
++  const paths = [];
++
++  for (let i = 0; i < argv.length; i++) {
++    const a = argv[i];
++    if (a === '--dirsfirst') {
++      opts.dirsFirst = true;
++    } else if (a === '--') {
++      for (i++; i < argv.length; i++) paths.push(argv[i]);
++    } else if (a.startsWith('--')) {
++      // unknown long option (e.g. --noreport); ignore for parity scope
++    } else if (a.length > 1 && a.startsWith('-')) {
++      for (let j = 1; j < a.length; j++) {
++        const c = a[j];
++        if (c === 'a') opts.all = true;
++        else if (c === 'd') opts.dirsOnly = true;
++        else if (c === 'J') opts.json = true;
++        else if (c === 'n' || c === 'C') { /* color flags; arbore never colors */ }
++        else if (c === 'L' || c === 'I' || c === 'P') {
++          const inline = a.slice(j + 1);
++          const val = inline || argv[++i];
++          if (c === 'L') opts.maxDepth = Number(val);
++          else if (c === 'I') opts.ignore.push(...splitPatterns(val));
++          else opts.filePat.push(...splitPatterns(val));
++          break; // option consumed the rest of this token
++        }
++      }
++    } else {
++      paths.push(a);
++    }
++  }
++  if (paths.length === 0) paths.push('.');
++  return { opts, paths };
++}
++
++// ---- glob matching (tree-style: `|` alternation, `*` and `?`) ----------
++function splitPatterns(str) {
++  return (str ?? '').split('|').filter((p) => p.length > 0);
++}
++
++function globToRegExp(glob) {
++  let re = '^';
++  for (const ch of glob) {
++    if (ch === '*') re += '.*';
++    else if (ch === '?') re += '.';
++    else re += ch.replace(/[.+^${}()|[\]\\]/g, '\\$&');
++  }
++  return new RegExp(re + '$');
++}
++
++function matchesAny(name, patterns) {
++  return patterns.some((p) => globToRegExp(p).test(name));
++}
++
++// ---- byte-order (C locale) comparison ----------------------------------
++function byteCompare(a, b) {
++  return Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8'));
++}
++
++// ---- directory listing (filter + sort) ---------------------------------
++// Returns a sorted Dirent[] or null when the directory cannot be opened.
++function listDir(absDir, opts) {
++  let entries;
++  try {
++    entries = fs.readdirSync(absDir, { withFileTypes: true });
++  } catch {
++    return null;
++  }
++  const kept = entries.filter((e) => {
++    if (!opts.all && e.name.startsWith('.')) return false;
++    if (opts.ignore.length && matchesAny(e.name, opts.ignore)) return false;
++    const isDir = e.isDirectory();
++    if (opts.dirsOnly && !isDir) return false;
++    // -P filters files only; directories are always traversed/shown.
++    if (opts.filePat.length && !isDir && !matchesAny(e.name, opts.filePat)) return false;
++    return true;
++  });
++  kept.sort((a, b) => {
++    if (opts.dirsFirst) {
++      const ad = a.isDirectory();
++      const bd = b.isDirectory();
++      if (ad !== bd) return ad ? -1 : 1;
++    }
++    return byteCompare(a.name, b.name);
++  });
++  return kept;
++}
++
++// ---- text rendering (├── └── style, ASCII) -----------------------------
++function renderText(rootName, absRoot, opts) {
++  const counts = { dirs: 0, files: 0 };
++  const lines = [];
++  let exitCode = 0;
++
++  const top = listDir(absRoot, opts);
++  if (top === null) {
++    lines.push(`${rootName}  [error opening dir]`);
++    exitCode = 2;
++  } else {
++    lines.push(rootName);
++    counts.dirs++; // the root itself counts as a directory
++    walk(top, absRoot, '', 1);
++  }
++
++  function walk(entries, absDir, prefix, depth) {
++    entries.forEach((e, i) => {
++      const last = i === entries.length - 1;
++      const isDir = e.isDirectory();
++      lines.push(prefix + (last ? '`-- ' : '|-- ') + e.name);
++      if (isDir) counts.dirs++;
++      else counts.files++;
++      if (isDir && (opts.maxDepth === null || depth < opts.maxDepth)) {
++        const childAbs = path.join(absDir, e.name);
++        const children = listDir(childAbs, opts);
++        if (children) walk(children, childAbs, prefix + (last ? '    ' : '|   '), depth + 1);
++      }
++    });
++  }
++
++  const report = opts.dirsOnly
++    ? dirWord(counts.dirs)
++    : `${dirWord(counts.dirs)}, ${fileWord(counts.files)}`;
++  const stdout = [...lines, '', report].join('\n') + '\n';
++  return { stdout, stderr: '', code: exitCode };
++}
++
++function dirWord(n) {
++  return `${n} director${n === 1 ? 'y' : 'ies'}`;
++}
++function fileWord(n) {
++  return `${n} file${n === 1 ? '' : 's'}`;
++}
++
++// ---- JSON rendering (-J) ------------------------------------------------
++function renderJson(rootName, absRoot, opts) {
++  const counts = { dirs: 0, files: 0 };
++
++  function build(entries, absDir, depth) {
++    const out = [];
++    for (const e of entries) {
++      if (e.isDirectory()) {
++        counts.dirs++;
++        let contents = [];
++        if (opts.maxDepth === null || depth < opts.maxDepth) {
++          const childAbs = path.join(absDir, e.name);
++          const children = listDir(childAbs, opts);
++          if (children) contents = build(children, childAbs, depth + 1);
++        }
++        out.push({ type: 'directory', name: e.name, contents });
++      } else {
++        counts.files++;
++        out.push({ type: 'file', name: e.name });
++      }
++    }
++    return out;
++  }
++
++  const top = listDir(absRoot, opts);
++  let rootNode;
++  let code = 0;
++  if (top === null) {
++    rootNode = { type: 'directory', name: rootName, contents: [], error: 'error opening dir' };
++    code = 2;
++  } else {
++    counts.dirs++;
++    rootNode = { type: 'directory', name: rootName, contents: build(top, absRoot, 1) };
++  }
++
++  const report = { type: 'report', directories: counts.dirs, files: counts.files };
++  const stdout =
++    '[\n' + serializeNode(rootNode, 4) + '\n,    ' + serializeReport(report) + '\n]\n';
++  return { stdout, stderr: '', code };
++}
++
++function serializeNode(node, indent) {
++  const pad = ' '.repeat(indent);
++  if (node.type === 'file') {
++    return `${pad}{"type":"file","name":${JSON.stringify(node.name)}}`;
++  }
++  const head = `${pad}{"type":"directory","name":${JSON.stringify(node.name)},"contents":[`;
++  if (!node.contents || node.contents.length === 0) return head + ']}';
++  const body = node.contents.map((c) => serializeNode(c, indent + 4)).join(',\n');
++  return head + '\n' + body + '\n' + pad + ']}';
++}
++
++function serializeReport(r) {
++  return `{"type":"report","directories":${r.directories},"files":${r.files}}`;
++}
++
++// ---- entry point -------------------------------------------------------
++export function main(argv, cwd = process.cwd()) {
++  const { opts, paths } = parseArgs(argv);
++  const rootName = paths[0];
++  const absRoot = path.resolve(cwd, rootName);
++  return opts.json
++    ? renderJson(rootName, absRoot, opts)
++    : renderText(rootName, absRoot, opts);
++}
+diff --git a/test/helper.mjs b/test/helper.mjs
+new file mode 100644
+index 0000000..ba9ff9b
+--- /dev/null
++++ b/test/helper.mjs
+@@ -0,0 +1,24 @@
++// Shared test helpers: locate repo paths, (re)generate the fixture, run the CLI.
++import { spawnSync } from 'node:child_process';
++import { fileURLToPath } from 'node:url';
++import path from 'node:path';
++
++const here = path.dirname(fileURLToPath(import.meta.url));
++export const repoRoot = path.resolve(here, '..');
++export const testDir = here;
++export const bin = path.join(repoRoot, 'bin', 'arbore.mjs');
++
++// node_modules is gitignored, so the fixture must be regenerated before tests.
++export function makeFixture() {
++  const r = spawnSync('bash', [path.join(repoRoot, 'tools', 'make-fixture.sh'), 'fx-tree'], {
++    cwd: testDir,
++    encoding: 'utf8',
++  });
++  if (r.status !== 0) throw new Error('make-fixture failed: ' + (r.stderr || r.stdout));
++}
++
++// Run the CLI from test/ (same cwd the goldens were captured from).
++export function runArbore(args) {
++  const r = spawnSync('node', [bin, ...args], { cwd: testDir, encoding: 'utf8' });
++  return { stdout: r.stdout, stderr: r.stderr, code: r.status };
++}
+diff --git a/test/index.js b/test/index.js
+new file mode 100644
+index 0000000..a852d11
+--- /dev/null
++++ b/test/index.js
+@@ -0,0 +1,4 @@
++// Barrel: makes `node --test test/` resolve this dir to a module that
++// imports every test file so the gate's directory argument discovers them.
++import './r0.test.mjs';
++import './parity.test.mjs';
+diff --git a/test/parity.test.mjs b/test/parity.test.mjs
+new file mode 100644
+index 0000000..84d4054
+--- /dev/null
++++ b/test/parity.test.mjs
+@@ -0,0 +1,44 @@
++// Parity tests: one per golden case, comparing stdout/stderr/exit exactly.
++import test, { before } from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import path from 'node:path';
++import { makeFixture, runArbore, testDir } from './helper.mjs';
++
++const goldenDir = path.join(testDir, 'golden');
++
++// Each case: the exact argv passed to arbore (cwd = test/, as goldens were captured).
++const CASES = {
++  default: ['fx-tree'],
++  a: ['-a', 'fx-tree'],
++  d: ['-d', 'fx-tree'],
++  L1: ['-L', '1', 'fx-tree'],
++  L2: ['-L', '2', 'fx-tree'],
++  ad: ['-a', '-d', 'fx-tree'],
++  missing: ['nu-exista'],
++  I: ['-I', 'node_modules', 'fx-tree'],
++  P: ['-P', '*.js', 'fx-tree'],
++  dirsfirst: ['--dirsfirst', 'fx-tree'],
++  J: ['-J', 'fx-tree'],
++  IP: ['-I', 'node_modules|docs', 'fx-tree'],
++};
++
++function golden(name) {
++  return {
++    out: fs.readFileSync(path.join(goldenDir, name + '.out'), 'utf8'),
++    err: fs.readFileSync(path.join(goldenDir, name + '.err'), 'utf8'),
++    rc: Number(fs.readFileSync(path.join(goldenDir, name + '.rc'), 'utf8').trim()),
++  };
++}
++
++before(() => makeFixture());
++
++for (const [name, args] of Object.entries(CASES)) {
++  test(`parity: ${name} (${args.join(' ')})`, () => {
++    const got = runArbore(args);
++    const want = golden(name);
++    assert.equal(got.stdout, want.out, 'stdout mismatch');
++    assert.equal(got.stderr, want.err, 'stderr mismatch');
++    assert.equal(got.code, want.rc, 'exit code mismatch');
++  });
++}
+diff --git a/test/r0.test.mjs b/test/r0.test.mjs
+new file mode 100644
+index 0000000..a93db62
+--- /dev/null
++++ b/test/r0.test.mjs
+@@ -0,0 +1,19 @@
++// R0 smoke tests: the CLI prints the root name and a report line.
++import test, { before } from 'node:test';
++import assert from 'node:assert/strict';
++import { makeFixture, runArbore } from './helper.mjs';
++
++before(() => makeFixture());
++
++test('prints the root name as the first line', () => {
++  const { stdout, code } = runArbore(['fx-tree']);
++  assert.equal(code, 0);
++  assert.equal(stdout.split('\n')[0], 'fx-tree');
++});
++
++test('ends with a directories/files report line', () => {
++  const { stdout } = runArbore(['fx-tree']);
++  const lines = stdout.split('\n').filter((l) => l.length > 0);
++  const last = lines[lines.length - 1];
++  assert.match(last, /^\d+ director(y|ies)(, \d+ files?)?$/);
++});
+v24.22.1
+
+exec
+/bin/bash -lc "node --input-type=module <<'JS'
+import {main} from './src/arbore.mjs';
+import fs from 'node:fs';
+const cases={default:['fx-tree'],a:['-a','fx-tree'],d:['-d','fx-tree'],L1:['-L','1','fx-tree'],L2:['-L','2','fx-tree'],ad:['-a','-d','fx-tree'],missing:['nu-exista'],I:['-I','node_modules','fx-tree'],P:['-P','*.js','fx-tree'],dirsfirst:['--dirsfirst','fx-tree'],J:['-J','fx-tree'],IP:['-I','node_modules|docs','fx-tree']};
+for(const [n,args] of Object.entries(cases)){const r=main(args,process.cwd()+'/test');console.log(n,r.stdout===fs.readFileSync('test/golden/'+n+'.out','utf8')&&r.stderr===fs.readFileSync('test/golden/'+n+'.err','utf8')&&r.code===Number(fs.readFileSync('test/golden/'+n+'.rc','utf8')));}
+for(const v of ['0','abc','-1']) console.log('depth',v,JSON.stringify(main(['-L',v,'test/fx-tree'])));
+const tmp=fs.mkdtempSync('/tmp/checker-edge-');fs.mkdirSync(tmp+'/locked',0);fs.symlinkSync('.',tmp+'/loop');
+console.log('edges',JSON.stringify(main([tmp]))); console.log('json missing',JSON.stringify(main(['-J',tmp+'/missing'])));
+JS" in /workspace/research/programatorul-viitorului/pilot-arbore/repo
+ succeeded in 0ms:
+default true
+a true
+d true
+L1 true
+L2 true
+ad true
+missing true
+I true
+P true
+dirsfirst true
+J true
+IP true
+depth 0 {"stdout":"test/fx-tree\n|-- 10.txt\n|-- 9.txt\n|-- README.md\n|-- Zeta\n|-- _under.txt\n|-- a.js\n|-- alpha\n|-- b.txt\n|-- docs\n`-- node_modules\n\n5 directories, 6 files\n","stderr":"","code":0}
+depth abc {"stdout":"test/fx-tree\n|-- 10.txt\n|-- 9.txt\n|-- README.md\n|-- Zeta\n|-- _under.txt\n|-- a.js\n|-- alpha\n|-- b.txt\n|-- docs\n`-- node_modules\n\n5 directories, 6 files\n","stderr":"","code":0}
+depth -1 {"stdout":"test/fx-tree\n|-- 10.txt\n|-- 9.txt\n|-- README.md\n|-- Zeta\n|-- _under.txt\n|-- a.js\n|-- alpha\n|-- b.txt\n|-- docs\n`-- node_modules\n\n5 directories, 6 files\n","stderr":"","code":0}
+edges {"stdout":"/tmp/checker-edge-cYklpY\n|-- locked\n`-- loop\n\n2 directories, 1 file\n","stderr":"","code":0}
+json missing {"stdout":"[\n    {\"type\":\"directory\",\"name\":\"/tmp/checker-edge-cYklpY/missing\",\"contents\":[]}\n,    {\"type\":\"report\",\"directories\":0,\"files\":0}\n]\n","stderr":"","code":2}
+
+codex
+SCORE: 2/5
+P0: Dovadă nereproductibilă: gate STOP, exit 9 (`spawnSync node EPERM`), versus GREEN maker; selftest 4 OK/7 FAIL. Mediul disponibil este Node 24, nu 22. F1 cere conectori Unicode, implementarea și golden-urile folosesc ASCII.
+P1: `-L 0`, `-L abc`, `-L -1` sunt acceptate cu exit 0, fără validare. Erorile de citire ale subdirectoarelor sunt ignorate, permițând succes cu listare incompletă; lipsesc teste pentru acestea. `-J` pierde câmpul de eroare la serializare.
+P2: Cele 12 cazuri golden coincid la apel direct pentru stdout/stderr/exit; aserțiunile pot pica, nu sunt vacue. `test/index.js` importă cele 14 teste fără dublare pentru comanda indicată. F2–F10 și F13 au implementare și cazuri golden; R3 rămâne deschis. Bucla symlink nu provoacă recursie; valorile invalide pentru adâncime nu produc crash. Fără indicii observate de GPL copiat, secrete, date clinice sau scope creep. PLAN rămâne DRAFT, referă `goal.md` absent și cere P1 ≥4/5 deși enumeră patru.
+VERDICT: ABSTAIN(NO-EVIDENCE)
+tokens used
+20,388
+SCORE: 2/5
+P0: Dovadă nereproductibilă: gate STOP, exit 9 (`spawnSync node EPERM`), versus GREEN maker; selftest 4 OK/7 FAIL. Mediul disponibil este Node 24, nu 22. F1 cere conectori Unicode, implementarea și golden-urile folosesc ASCII.
+P1: `-L 0`, `-L abc`, `-L -1` sunt acceptate cu exit 0, fără validare. Erorile de citire ale subdirectoarelor sunt ignorate, permițând succes cu listare incompletă; lipsesc teste pentru acestea. `-J` pierde câmpul de eroare la serializare.
+P2: Cele 12 cazuri golden coincid la apel direct pentru stdout/stderr/exit; aserțiunile pot pica, nu sunt vacue. `test/index.js` importă cele 14 teste fără dublare pentru comanda indicată. F2–F10 și F13 au implementare și cazuri golden; R3 rămâne deschis. Bucla symlink nu provoacă recursie; valorile invalide pentru adâncime nu produc crash. Fără indicii observate de GPL copiat, secrete, date clinice sau scope creep. PLAN rămâne DRAFT, referă `goal.md` absent și cere P1 ≥4/5 deși enumeră patru.
+VERDICT: ABSTAIN(NO-EVIDENCE)

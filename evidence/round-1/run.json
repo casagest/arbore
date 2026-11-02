@@ -1,0 +1,8 @@
+{
+ "cmd": "node --test test/",
+ "exit": 0,
+ "signal": null,
+ "ms": 518,
+ "sha256": "24e0fa267c5bc9b066e6d0eae597c2c810da79daa65e46ffee56d565532e966b",
+ "at": "2026-11-02T09:47:20.995Z"
+}

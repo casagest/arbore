@@ -1,2 +1,6 @@
 node_modules/
 evidence/latest/
+test/fx-tree/
+test/fx-locked/
+test/fx-edge/
+test/fx-empty/

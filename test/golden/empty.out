@@ -1,0 +1,6 @@
+fx-empty
+|-- emptydir
+`-- full
+    `-- f.txt
+
+3 directories, 1 file
